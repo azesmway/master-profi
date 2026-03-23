@@ -2,17 +2,7 @@ import Screen from '@components/ui/Screen'
 import { useQuery } from '@tanstack/react-query'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import {
-  ActivityIndicator,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View
-} from 'react-native'
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import SpecialistCard from '@/components/client/SpecialistCard'
@@ -141,71 +131,68 @@ export default function SearchScreen() {
           </View>
         </View>
 
-        {/* Category chips */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12, flexDirection: 'row' }}
-        >
-          {[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)].map(item => {
-            const isActive = item.id === activeCategory
-            return (
-              <Pressable
-                key={item.id ?? 'all'}
-                onPress={() => setActiveCategory(item.id ?? null)}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 6,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  backgroundColor: isActive ? '#FF6B35' : colors.card,
-                  borderColor: isActive ? '#FF6B35' : colors.textMuted + '30',
-                }}
-              >
-                <Text style={{ fontSize: 14 }}>{item.icon}</Text>
-                <Text
-                  style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}
-                  numberOfLines={1}
-                >
-                  {item.name}
-                </Text>
-              </Pressable>
-            )
-          })}
-        </ScrollView>
+        {/*/!* Category chips *!/*/}
+        {/*<FlatList*/}
+        {/*  horizontal*/}
+        {/*  showsHorizontalScrollIndicator={false}*/}
+        {/*  data={[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)] as any[]}*/}
+        {/*  keyExtractor={item => item.id ?? 'all'}*/}
+        {/*  style={{ flexGrow: 0 }}*/}
+        {/*  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}*/}
+        {/*  renderItem={({ item }) => {*/}
+        {/*    const isActive = item.id === activeCategory*/}
+        {/*    return (*/}
+        {/*      <Pressable*/}
+        {/*        style={{*/}
+        {/*          flexDirection: 'row',*/}
+        {/*          alignItems: 'center',*/}
+        {/*          gap: 6,*/}
+        {/*          paddingHorizontal: 12,*/}
+        {/*          paddingVertical: 8,*/}
+        {/*          borderRadius: 20,*/}
+        {/*          borderWidth: 1,*/}
+        {/*          flexShrink: 0,*/}
+        {/*          backgroundColor: isActive ? '#FF6B35' : colors.card,*/}
+        {/*          borderColor: isActive ? '#FF6B35' : colors.textMuted + '30',*/}
+        {/*        }}*/}
+        {/*        onPress={() => setActiveCategory(item.id ?? null)}*/}
+        {/*      >*/}
+        {/*        <Text style={{ fontSize: 14 }}>{item.icon}</Text>*/}
+        {/*        <Text style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}>*/}
+        {/*          {item.name}*/}
+        {/*        </Text>*/}
+        {/*      </Pressable>*/}
+        {/*    )*/}
+        {/*  }}*/}
+        {/*/>*/}
 
-        {/* Sort chips */}
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={SORT_OPTIONS}
-          keyExtractor={item => item.key}
-          style={{ flexGrow: 0 }}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}
-          renderItem={({ item }) => {
-            const isActive = sortBy === item.key
-            return (
-              <Pressable
-                onPress={() => setSortBy(item.key)}
-                style={{
-                  flexShrink: 0,
-                  paddingHorizontal: 12,
-                  paddingVertical: 8,
-                  borderRadius: 20,
-                  borderWidth: 1,
-                  backgroundColor: isActive ? colors.elevated : 'transparent',
-                  borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30',
-                }}>
-                <Text style={{ fontSize: 13, fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }}>
-                  {item.label}
-                </Text>
-              </Pressable>
-            )
-          }}
-        />
+        {/*/!* Sort chips *!/*/}
+        {/*<FlatList*/}
+        {/*  horizontal*/}
+        {/*  showsHorizontalScrollIndicator={false}*/}
+        {/*  data={SORT_OPTIONS}*/}
+        {/*  keyExtractor={item => item.key}*/}
+        {/*  style={{ flexGrow: 0 }}*/}
+        {/*  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}*/}
+        {/*  renderItem={({ item }) => {*/}
+        {/*    const isActive = sortBy === item.key*/}
+        {/*    return (*/}
+        {/*      <Pressable*/}
+        {/*        onPress={() => setSortBy(item.key)}*/}
+        {/*        style={{*/}
+        {/*          flexShrink: 0,*/}
+        {/*          paddingHorizontal: 12,*/}
+        {/*          paddingVertical: 8,*/}
+        {/*          borderRadius: 20,*/}
+        {/*          borderWidth: 1,*/}
+        {/*          backgroundColor: isActive ? colors.elevated : 'transparent',*/}
+        {/*          borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30'*/}
+        {/*        }}>*/}
+        {/*        <Text style={{ fontSize: 13, fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }}>{item.label}</Text>*/}
+        {/*      </Pressable>*/}
+        {/*    )*/}
+        {/*  }}*/}
+        {/*/>*/}
 
         {/* Results */}
         {isLoading ? (
@@ -228,6 +215,63 @@ export default function SearchScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <>
+                {/* Category chips */}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={{ flexGrow: 0, marginHorizontal: -20, marginBottom: 4 }}
+                  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 8, alignItems: 'center' }}>
+                  {[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)].map(item => {
+                    const isActive = item.id === activeCategory
+                    return (
+                      <Pressable
+                        key={item.id ?? 'all'}
+                        onPress={() => setActiveCategory(item.id ?? null)}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 6,
+                          paddingHorizontal: 12,
+                          paddingVertical: 8,
+                          borderRadius: 20,
+                          borderWidth: 1,
+                          backgroundColor: isActive ? '#FF6B35' : colors.card,
+                          borderColor: isActive ? '#FF6B35' : colors.textMuted + '30'
+                        }}>
+                        <Text style={{ fontSize: 14 }}>{item.icon}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}>{item.name}</Text>
+                      </Pressable>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Sort chips */}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={{ flexGrow: 0, marginHorizontal: -20, marginBottom: 12 }}
+                  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 4, alignItems: 'center' }}>
+                  {SORT_OPTIONS.map(item => {
+                    const isActive = sortBy === item.key
+                    return (
+                      <Pressable
+                        key={item.key}
+                        onPress={() => setSortBy(item.key)}
+                        style={{
+                          paddingHorizontal: 12,
+                          paddingVertical: 8,
+                          borderRadius: 20,
+                          borderWidth: 1,
+                          backgroundColor: isActive ? colors.elevated : 'transparent',
+                          borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30'
+                        }}>
+                        <Text style={{ fontSize: 13, fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }}>{item.label}</Text>
+                      </Pressable>
+                    )
+                  })}
+                </ScrollView>
+
+                {/* Status */}
                 {aiLoading && <AiThinkingBadge />}
                 {!aiLoading && <Text style={{ color: colors.textMuted, fontSize: 13, marginBottom: 4 }}>Найдено: {total} специалистов</Text>}
               </>
@@ -251,6 +295,50 @@ export default function SearchScreen() {
             )}
           />
         )}
+
+        {/*{isLoading ? (*/}
+        {/*  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>*/}
+        {/*    <ActivityIndicator size="large" color="#FF6B35" />*/}
+        {/*  </View>*/}
+        {/*) : isError ? (*/}
+        {/*  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>*/}
+        {/*    <Text style={{ fontSize: 40, marginBottom: 12 }}>⚠️</Text>*/}
+        {/*    <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600', marginBottom: 8 }}>Ошибка загрузки</Text>*/}
+        {/*    <Pressable onPress={() => refetch()} style={{ backgroundColor: '#FF6B35', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12 }}>*/}
+        {/*      <Text style={{ color: '#fff', fontWeight: '600' }}>Повторить</Text>*/}
+        {/*    </Pressable>*/}
+        {/*  </View>*/}
+        {/*) : (*/}
+        {/*  <FlatList*/}
+        {/*    data={specialists}*/}
+        {/*    keyExtractor={item => item.id}*/}
+        {/*    contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20, gap: 12 }}*/}
+        {/*    showsVerticalScrollIndicator={false}*/}
+        {/*    ListHeaderComponent={*/}
+        {/*      <>*/}
+        {/*        {aiLoading && <AiThinkingBadge />}*/}
+        {/*        {!aiLoading && <Text style={{ color: colors.textMuted, fontSize: 13, marginBottom: 4 }}>Найдено: {total} специалистов</Text>}*/}
+        {/*      </>*/}
+        {/*    }*/}
+        {/*    ListEmptyComponent={*/}
+        {/*      !aiLoading ? (*/}
+        {/*        <View style={{ alignItems: 'center', paddingVertical: 48 }}>*/}
+        {/*          <Text style={{ fontSize: 48, marginBottom: 12 }}>🔍</Text>*/}
+        {/*          <Text style={{ color: colors.text, fontSize: 18, fontWeight: '600', marginBottom: 8 }}>Ничего не найдено</Text>*/}
+        {/*          <Text style={{ color: colors.textSecondary, fontSize: 14, textAlign: 'center' }}>Попробуйте изменить запрос или создать заказ</Text>*/}
+        {/*          <Pressable onPress={() => router.push('/create-order')} style={{ marginTop: 16, backgroundColor: '#FF6B35', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}>*/}
+        {/*            <Text style={{ color: '#fff', fontWeight: '600' }}>Создать заказ</Text>*/}
+        {/*          </Pressable>*/}
+        {/*        </View>*/}
+        {/*      ) : null*/}
+        {/*    }*/}
+        {/*    renderItem={({ item, index }) => (*/}
+        {/*      <Animated.View entering={FadeInDown.delay(index * 60).springify()}>*/}
+        {/*        <SpecialistCard specialist={item} onPress={() => router.push(`/specialist/${item.id}`)} />*/}
+        {/*      </Animated.View>*/}
+        {/*    )}*/}
+        {/*  />*/}
+        {/*)}*/}
       </KeyboardAvoidingView>
     </Screen>
   )
