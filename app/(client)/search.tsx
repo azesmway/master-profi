@@ -2,7 +2,17 @@ import Screen from '@components/ui/Screen'
 import { useQuery } from '@tanstack/react-query'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native'
+import {
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View
+} from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import SpecialistCard from '@/components/client/SpecialistCard'
@@ -132,16 +142,17 @@ export default function SearchScreen() {
         </View>
 
         {/* Category chips */}
-        <FlatList
+        <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          data={[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)] as any[]}
-          keyExtractor={item => item.id ?? 'all'}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}
-          renderItem={({ item }) => {
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12, flexDirection: 'row' }}
+        >
+          {[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)].map(item => {
             const isActive = item.id === activeCategory
             return (
               <Pressable
+                key={item.id ?? 'all'}
+                onPress={() => setActiveCategory(item.id ?? null)}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
@@ -151,18 +162,20 @@ export default function SearchScreen() {
                   borderRadius: 20,
                   borderWidth: 1,
                   backgroundColor: isActive ? '#FF6B35' : colors.card,
-                  borderColor: isActive ? '#FF6B35' : colors.border ?? colors.textMuted + '30',
+                  borderColor: isActive ? '#FF6B35' : colors.textMuted + '30',
                 }}
-                onPress={() => setActiveCategory(item.id ?? null)}
               >
                 <Text style={{ fontSize: 14 }}>{item.icon}</Text>
-                <Text style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}>
+                <Text
+                  style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}
+                  numberOfLines={1}
+                >
                   {item.name}
                 </Text>
               </Pressable>
             )
-          }}
-        />
+          })}
+        </ScrollView>
 
         {/* Sort chips */}
         <FlatList
@@ -175,8 +188,20 @@ export default function SearchScreen() {
           renderItem={({ item }) => {
             const isActive = sortBy === item.key
             return (
-              <Pressable onPress={() => setSortBy(item.key)} style={{ backgroundColor: isActive ? colors.elevated : 'transparent' }}>
-                <Text style={{ color: isActive ? colors.text : colors.textMuted }}>{item.label}</Text>
+              <Pressable
+                onPress={() => setSortBy(item.key)}
+                style={{
+                  flexShrink: 0,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  backgroundColor: isActive ? colors.elevated : 'transparent',
+                  borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30',
+                }}>
+                <Text style={{ fontSize: 13, fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }}>
+                  {item.label}
+                </Text>
               </Pressable>
             )
           }}
