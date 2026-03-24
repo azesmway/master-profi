@@ -1,6 +1,6 @@
 // ─── User & Auth ────────────────────────────────────────────────────────────
 
-export type UserRole = 'client' | 'specialist' | 'admin'
+export type UserRole = 'client' | 'specialist' | 'admin' | 'partner'
 
 export interface User {
   id: string

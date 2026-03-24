@@ -1,7 +1,11 @@
+import { useTheme } from '@hooks/useTheme'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
+import {
+  ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput,
+  TouchableOpacity, View
+} from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import Screen from '@/components/ui/Screen'
@@ -10,7 +14,6 @@ import { getApiError } from '@/services/api'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types'
-import {useTheme} from "@hooks/useTheme";
 
 const ROLES: Array<{ role: UserRole; title: string; desc: string; icon: string }> = [
   {
@@ -24,6 +27,12 @@ const ROLES: Array<{ role: UserRole; title: string; desc: string; icon: string }
     title: 'Я специалист',
     desc: 'Принимаю заказы, предлагаю услуги',
     icon: '🛠️'
+  },
+  {
+    role: 'partner',
+    title: 'Я партнёр',
+    desc: 'Привожу клиентов, получаю комиссию',
+    icon: '🤝'
   }
 ]
 
@@ -43,12 +52,12 @@ export default function RegisterScreen() {
       authService.register({
         phone: user?.phone ?? '',
         name: name.trim(),
-        role
+        role,
+        city
       }),
     onSuccess: ({ data }) => {
       setUser(data.user)
       setTokens(data.accessToken, data.refreshToken)
-      // AuthGuard redirects automatically
     },
     onError: err => setError(getApiError(err))
   })
@@ -81,8 +90,8 @@ export default function RegisterScreen() {
                   setName(t)
                   setError('')
                 }}
-                placeholder="Алибек Джаксыбеков"
-                placeholderTextColor="#555"
+                placeholder="Ваше ФИО"
+                placeholderTextColor="#c0c0c0"
                 autoCapitalize="words"
                 returnKeyType="done"
                 className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 py-5 text-white text-base"
@@ -105,7 +114,7 @@ export default function RegisterScreen() {
                     ].join(' ')}>
                     <Text className="text-3xl">{r.icon}</Text>
                     <View className="flex-1">
-                      <Text className={['font-semibold text-base', role === r.role ? 'text-primary' : 'text-white'].join(' ')}>{r.title}</Text>
+                      <Text style={{ color: colors.text }}>{r.title}</Text>
                       <Text className="text-text-muted dark:text-text-secondary text-sm mt-0.5">{r.desc}</Text>
                     </View>
                     <View className={['w-5 h-5 rounded-full border-2', role === r.role ? 'border-primary bg-primary' : 'border-light-border dark:border-dark-border'].join(' ')} />
@@ -127,15 +136,15 @@ export default function RegisterScreen() {
               {cityOpen && (
                 <View className="bg-light-elevated dark:bg-dark-elevated border border-light-border dark:border-dark-border rounded-2xl mt-2 overflow-hidden">
                   {KZ_CITIES.map(c => (
-                    <Pressable
+                    <TouchableOpacity
                       key={c}
                       onPress={() => {
                         setCity(c)
                         setCityOpen(false)
                       }}
                       className={['px-4 py-3.5 border-b border-light-border dark:border-dark-border active:bg-dark-border', c === city ? 'bg-primary/10' : ''].join(' ')}>
-                      <Text className={c === city ? 'text-primary font-medium' : 'text-white'}>{c}</Text>
-                    </Pressable>
+                      <Text className={c === city ? 'text-primary font-medium' : 'text-white'} style={{ color: colors.text }}>{c}</Text>
+                    </TouchableOpacity>
                   ))}
                 </View>
               )}

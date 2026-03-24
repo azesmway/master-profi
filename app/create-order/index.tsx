@@ -26,6 +26,8 @@ interface OrderForm {
   currency: 'KZT' | 'RUB'
   city: string
   photos: string[]
+  orderType: 'standard' | 'barter'
+  barterOffer: string
 }
 
 export default function CreateOrderScreen() {
@@ -40,7 +42,9 @@ export default function CreateOrderScreen() {
     budget: '',
     currency: 'KZT',
     city: 'Алматы',
-    photos: []
+    photos: [],
+    orderType: 'standard',
+    barterOffer: ''
   })
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [errors, setErrors] = useState<Partial<OrderForm>>({})
@@ -91,11 +95,14 @@ export default function CreateOrderScreen() {
         title: form.title,
         description: form.description,
         categoryId: form.categoryId || undefined,
-        budgetFrom: form.budget ? parseInt(form.budget) : undefined,
         budgetCurrency: form.currency,
         budgetUnit: 'project',
         city: form.city,
-        photos: form.photos
+        photos: form.photos,
+        // @ts-ignore
+        type: form.orderType,
+        barterClientOffer: form.orderType === 'barter' ? form.barterOffer : undefined,
+        budgetFrom: form.orderType !== 'barter' && form.budget ? parseInt(form.budget) : undefined
       }),
     onSuccess: () => {
       router.replace('/(client)/orders')
@@ -136,6 +143,44 @@ export default function CreateOrderScreen() {
           {step === 1 && (
             <Animated.View entering={FadeInDown.springify()} className="gap-5">
               <Text className="text-dark dark:text-white text-2xl font-bold">Что нужно сделать?</Text>
+
+              <View>
+                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Тип заказа</Text>
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <Pressable
+                    onPress={() => update('orderType', 'standard')}
+                    style={{
+                      flex: 1,
+                      paddingVertical: 12,
+                      borderRadius: 14,
+                      borderWidth: 2,
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: form.orderType === 'standard' ? '#FF6B3515' : colors.card,
+                      borderColor: form.orderType === 'standard' ? '#FF6B35' : colors.border
+                    }}>
+                    <Text style={{ fontSize: 20 }}>💰</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: form.orderType === 'standard' ? '#FF6B35' : colors.textMuted }}>Обычный</Text>
+                    <Text style={{ fontSize: 10, color: colors.textMuted, textAlign: 'center' }}>С оплатой</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => update('orderType', 'barter')}
+                    style={{
+                      flex: 1,
+                      paddingVertical: 12,
+                      borderRadius: 14,
+                      borderWidth: 2,
+                      alignItems: 'center',
+                      gap: 4,
+                      backgroundColor: form.orderType === 'barter' ? '#8B5CF615' : colors.card,
+                      borderColor: form.orderType === 'barter' ? '#8B5CF6' : colors.border
+                    }}>
+                    <Text style={{ fontSize: 20 }}>🔄</Text>
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: form.orderType === 'barter' ? '#8B5CF6' : colors.textMuted }}>Бартер</Text>
+                    <Text style={{ fontSize: 10, color: colors.textMuted, textAlign: 'center' }}>Обмен</Text>
+                  </Pressable>
+                </View>
+              </View>
 
               {/* Category */}
               <View>
@@ -227,29 +272,31 @@ export default function CreateOrderScreen() {
           {/* Step 2: Budget & Location */}
           {step === 2 && (
             <Animated.View entering={FadeInDown.springify()} className="gap-5">
-              <Text className="text-dark dark:text-white text-2xl font-bold">Бюджет и место</Text>
+              <Text className="text-dark dark:text-white text-2xl font-bold">Бюджет/Бартер и место</Text>
 
               {/* Budget */}
-              <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Бюджет (необязательно)</Text>
-                <View className="flex-row gap-2">
-                  <View className="flex-1 flex-row items-center bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl overflow-hidden">
-                    <TextInput
-                      value={form.budget}
-                      onChangeText={t => update('budget', t.replace(/\D/g, ''))}
-                      placeholder="10 000"
-                      placeholderTextColor={colors.textMuted}
-                      keyboardType="number-pad"
-                      style={{ flex: 1, color: colors.text, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14 }}
-                    />
+              {form.orderType !== 'barter' && (
+                <View>
+                  <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Бюджет (необязательно)</Text>
+                  <View className="flex-row gap-2">
+                    <View className="flex-1 flex-row items-center bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl overflow-hidden">
+                      <TextInput
+                        value={form.budget}
+                        onChangeText={t => update('budget', t.replace(/\D/g, ''))}
+                        placeholder="10 000"
+                        placeholderTextColor={colors.textMuted}
+                        keyboardType="number-pad"
+                        style={{ flex: 1, color: colors.text, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14 }}
+                      />
+                    </View>
+                    <Pressable
+                      onPress={() => update('currency', form.currency === 'KZT' ? 'RUB' : 'KZT')}
+                      className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 justify-center">
+                      <Text className="text-dark dark:text-white font-medium">{CURRENCIES[form.currency].symbol}</Text>
+                    </Pressable>
                   </View>
-                  <Pressable
-                    onPress={() => update('currency', form.currency === 'KZT' ? 'RUB' : 'KZT')}
-                    className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 justify-center">
-                    <Text className="text-dark dark:text-white font-medium">{CURRENCIES[form.currency].symbol}</Text>
-                  </Pressable>
                 </View>
-              </View>
+              )}
 
               {/* City */}
               <View>
@@ -339,6 +386,44 @@ export default function CreateOrderScreen() {
                 )}
                 <Text className="text-text-muted dark:text-text-secondary text-sm">📍 {form.city}</Text>
               </View>
+
+              {form.orderType === 'barter' && (
+                <Animated.View entering={FadeInDown.springify()}>
+                  <View
+                    style={{
+                      backgroundColor: '#8B5CF615',
+                      borderRadius: 16,
+                      padding: 16,
+                      borderWidth: 1,
+                      borderColor: '#8B5CF630',
+                      marginBottom: 16
+                    }}>
+                    <Text style={{ color: '#8B5CF6', fontWeight: '700', marginBottom: 4 }}>🔄 Бартер-заказ</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 18 }}>Опишите что вы готовы предложить мастеру взамен его услуг</Text>
+                  </View>
+                  <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Что предлагаете мастеру взамен? *</Text>
+                  <TextInput
+                    value={form.barterOffer}
+                    onChangeText={t => update('barterOffer', t)}
+                    placeholder="Например: Профессиональная фотосессия 2 часа. Или: Уроки английского 5 занятий..."
+                    placeholderTextColor={colors.textMuted}
+                    multiline
+                    numberOfLines={4}
+                    style={{
+                      minHeight: 110,
+                      backgroundColor: colors.card,
+                      borderWidth: 1.5,
+                      borderColor: '#8B5CF640',
+                      borderRadius: 16,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                      color: colors.text,
+                      fontSize: 14,
+                      textAlignVertical: 'top'
+                    }}
+                  />
+                </Animated.View>
+              )}
 
               {/* Promo code */}
               <PromoCodeInput onApplied={promo => setAppliedPromo(promo)} onRemoved={() => setAppliedPromo(null)} />

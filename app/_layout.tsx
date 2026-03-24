@@ -93,6 +93,11 @@ function AuthGuard() {
           case 'admin':
             router.replace('/(admin)/dashboard')
             break
+          // @ts-ignore
+          case 'partner':
+            // @ts-ignore
+            router.replace('/(partner)/orders')
+            break
           default:
             router.replace('/(client)/home')
             break
