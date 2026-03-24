@@ -217,6 +217,17 @@ export default function ClientProfileScreen() {
             ))}
           </View>
 
+          {/* Referral */}
+          <View style={[s.card, { gap: 0, marginTop: 16 }]}>
+            <Pressable
+              onPress={() => {
+                // @ts-ignore
+                router.push('/referral')
+              }}>
+              <Text>🎁 Пригласить друга — 500 ₸</Text>
+            </Pressable>
+          </View>
+
           {/* Logout */}
           <Pressable onPress={handleLogout} style={[s.buttonOutline, { marginTop: 24, borderColor: '#EF4444' }]}>
             <Text style={{ color: '#EF4444', fontWeight: '600' }}>Выйти из аккаунта</Text>

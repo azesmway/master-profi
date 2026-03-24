@@ -20,6 +20,7 @@ import { QUERY_KEYS } from '@/constants'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useSocket } from '@/hooks/useSocket'
 import { selectIsAuthenticated, useAuthStore } from '@/store/authStore'
+import { useLocationOrders } from '@/hooks/useLocationOrders'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -114,6 +115,8 @@ export default function RootLayout() {
     Manrope_700Bold,
     Manrope_800ExtraBold
   })
+
+  useLocationOrders()
 
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync()

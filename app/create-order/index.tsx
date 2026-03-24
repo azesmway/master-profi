@@ -1,4 +1,5 @@
 import Screen from '@components/ui/Screen'
+import { PromoValidateResult } from '@services/promoService'
 import { useMutation } from '@tanstack/react-query'
 import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
@@ -8,6 +9,7 @@ import { Image } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { PromoCodeInput } from '@/components/ui/PromoCodeInput'
 import VoiceInputButton from '@/components/ui/VoiceInputButton'
 import { CATEGORIES, CURRENCIES, KZ_CITIES } from '@/constants'
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
@@ -43,6 +45,7 @@ export default function CreateOrderScreen() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [errors, setErrors] = useState<Partial<OrderForm>>({})
   const [cityOpen, setCityOpen] = useState(false)
+  const [appliedPromo, setAppliedPromo] = useState<PromoValidateResult | null>(null)
 
   const recorder = useAudioRecorder({
     whisperUrl: WHISPER_URL,
@@ -336,6 +339,9 @@ export default function CreateOrderScreen() {
                 )}
                 <Text className="text-text-muted dark:text-text-secondary text-sm">📍 {form.city}</Text>
               </View>
+
+              {/* Promo code */}
+              <PromoCodeInput onApplied={promo => setAppliedPromo(promo)} onRemoved={() => setAppliedPromo(null)} />
 
               <Pressable onPress={handleSubmit} disabled={mutation.isPending} className="bg-primary py-4 rounded-2xl items-center mb-8 active:opacity-80 disabled:opacity-50">
                 {mutation.isPending ? <ActivityIndicator color="white" /> : <Text className="text-dark dark:text-white font-bold text-base">Опубликовать заказ 🚀</Text>}

@@ -131,69 +131,6 @@ export default function SearchScreen() {
           </View>
         </View>
 
-        {/*/!* Category chips *!/*/}
-        {/*<FlatList*/}
-        {/*  horizontal*/}
-        {/*  showsHorizontalScrollIndicator={false}*/}
-        {/*  data={[{ id: null, name: 'Все', icon: '🔎' }, ...CATEGORIES.slice(0, 8)] as any[]}*/}
-        {/*  keyExtractor={item => item.id ?? 'all'}*/}
-        {/*  style={{ flexGrow: 0 }}*/}
-        {/*  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}*/}
-        {/*  renderItem={({ item }) => {*/}
-        {/*    const isActive = item.id === activeCategory*/}
-        {/*    return (*/}
-        {/*      <Pressable*/}
-        {/*        style={{*/}
-        {/*          flexDirection: 'row',*/}
-        {/*          alignItems: 'center',*/}
-        {/*          gap: 6,*/}
-        {/*          paddingHorizontal: 12,*/}
-        {/*          paddingVertical: 8,*/}
-        {/*          borderRadius: 20,*/}
-        {/*          borderWidth: 1,*/}
-        {/*          flexShrink: 0,*/}
-        {/*          backgroundColor: isActive ? '#FF6B35' : colors.card,*/}
-        {/*          borderColor: isActive ? '#FF6B35' : colors.textMuted + '30',*/}
-        {/*        }}*/}
-        {/*        onPress={() => setActiveCategory(item.id ?? null)}*/}
-        {/*      >*/}
-        {/*        <Text style={{ fontSize: 14 }}>{item.icon}</Text>*/}
-        {/*        <Text style={{ fontSize: 13, fontWeight: '500', color: isActive ? '#fff' : colors.textMuted }}>*/}
-        {/*          {item.name}*/}
-        {/*        </Text>*/}
-        {/*      </Pressable>*/}
-        {/*    )*/}
-        {/*  }}*/}
-        {/*/>*/}
-
-        {/*/!* Sort chips *!/*/}
-        {/*<FlatList*/}
-        {/*  horizontal*/}
-        {/*  showsHorizontalScrollIndicator={false}*/}
-        {/*  data={SORT_OPTIONS}*/}
-        {/*  keyExtractor={item => item.key}*/}
-        {/*  style={{ flexGrow: 0 }}*/}
-        {/*  contentContainerStyle={{ paddingHorizontal: 20, gap: 8, paddingBottom: 12 }}*/}
-        {/*  renderItem={({ item }) => {*/}
-        {/*    const isActive = sortBy === item.key*/}
-        {/*    return (*/}
-        {/*      <Pressable*/}
-        {/*        onPress={() => setSortBy(item.key)}*/}
-        {/*        style={{*/}
-        {/*          flexShrink: 0,*/}
-        {/*          paddingHorizontal: 12,*/}
-        {/*          paddingVertical: 8,*/}
-        {/*          borderRadius: 20,*/}
-        {/*          borderWidth: 1,*/}
-        {/*          backgroundColor: isActive ? colors.elevated : 'transparent',*/}
-        {/*          borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30'*/}
-        {/*        }}>*/}
-        {/*        <Text style={{ fontSize: 13, fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }}>{item.label}</Text>*/}
-        {/*      </Pressable>*/}
-        {/*    )*/}
-        {/*  }}*/}
-        {/*/>*/}
-
         {/* Results */}
         {isLoading ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
