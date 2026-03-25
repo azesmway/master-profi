@@ -150,6 +150,8 @@ export default function RootLayout() {
             <Stack.Screen name="create-order" options={{ presentation: 'modal' }} />
             <Stack.Screen name="ai-chat" />
             <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
+            <Stack.Screen name="(partner)" />
+            <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
           </Stack>
         </View>
       </GestureHandlerRootView>

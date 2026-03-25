@@ -91,6 +91,7 @@ export function makeStyles(colors: typeof COLORS.light | typeof COLORS.dark) {
     buttonText: {
       color: '#FFFFFF',
       fontSize: 16,
+      paddingHorizontal: 20,
       fontWeight: '700' as const
     },
 

@@ -1,11 +1,8 @@
 import { useTheme } from '@hooks/useTheme'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'expo-router'
+import {useLocalSearchParams, useRouter} from 'expo-router'
 import { useState } from 'react'
-import {
-  ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput,
-  TouchableOpacity, View
-} from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import Screen from '@/components/ui/Screen'
@@ -40,17 +37,18 @@ export default function RegisterScreen() {
   const router = useRouter()
   const { colors } = useTheme()
   const { setUser, setTokens, user } = useAuthStore()
-
   const [name, setName] = useState('')
   const [role, setRole] = useState<UserRole>('client')
   const [city, setCity] = useState('Алматы')
   const [error, setError] = useState('')
   const [cityOpen, setCityOpen] = useState(false)
 
+  const params = useLocalSearchParams<{ phone?: string }>()
+
   const mutation = useMutation({
     mutationFn: () =>
       authService.register({
-        phone: user?.phone ?? '',
+        phone: params.phone ?? user?.phone ?? '',
         name: name.trim(),
         role,
         city
@@ -143,7 +141,9 @@ export default function RegisterScreen() {
                         setCityOpen(false)
                       }}
                       className={['px-4 py-3.5 border-b border-light-border dark:border-dark-border active:bg-dark-border', c === city ? 'bg-primary/10' : ''].join(' ')}>
-                      <Text className={c === city ? 'text-primary font-medium' : 'text-white'} style={{ color: colors.text }}>{c}</Text>
+                      <Text className={c === city ? 'text-primary font-medium' : 'text-white'} style={{ color: colors.text }}>
+                        {c}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>

@@ -64,6 +64,10 @@ export default function OtpScreen() {
         case 'admin':
           router.replace('/(admin)/dashboard')
           break
+        case 'partner':
+          // @ts-ignore
+          router.replace('/(partner)/orders')
+          break
         default:
           router.replace('/(client)/home')
           break
