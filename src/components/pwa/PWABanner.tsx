@@ -16,13 +16,11 @@ import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-nat
 
 import { API_BASE_URL } from '@/constants'
 import { usePWAContext } from '@/context/PWAContext'
-import { usePWA } from '@/hooks/usePWA'
 import { useAuthStore } from '@/store/authStore'
 
 export function PWABanner() {
   const { pushPermission, requestPushPermission } = usePWAContext()
   const { accessToken } = useAuthStore()
-  const pwa = usePWA(API_BASE_URL, accessToken)
 
   const [shown, setShown] = useState<'install' | 'push' | 'update' | 'install_ios' | null>(null)
   const opacity = useRef(new Animated.Value(0)).current
@@ -31,17 +29,23 @@ export function PWABanner() {
   useEffect(() => {
     if (!accessToken) return
 
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
 
+    // iOS не в standalone — пуши не работают, показываем инструкцию
     if (isIOS && !isStandalone) {
-      // На iOS сначала просим добавить на главный экран
-      show('install_ios')
+      const dismissed = sessionStorage.getItem('ios_install_dismissed')
+      if (!dismissed) {
+        const t = setTimeout(() => show('install_ios'), 2000)
+        return () => clearTimeout(t)
+      }
       return
     }
 
+    // Пуши ещё не запрашивались
     if (pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
-      setTimeout(() => show('push'), 3000)
+      const t = setTimeout(() => show('push'), 3000)
+      return () => clearTimeout(t)
     }
   }, [accessToken, pushPermission])
 
@@ -51,26 +55,6 @@ export function PWABanner() {
       setTimeout(() => show('push'), 3000)
     }
   }, [accessToken, pushPermission])
-
-  // Определяем что показать
-  useEffect(() => {
-    if (pwa.updateAvailable) {
-      show('update')
-      return
-    }
-    if (pwa.isInstallable && !pwa.isInstalled) {
-      const dismissed = sessionStorage.getItem('pwa_install_dismissed')
-      if (!dismissed) {
-        show('install')
-        return
-      }
-    }
-    if (accessToken && pwa.pushSupported && pwa.pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
-      // Небольшая задержка — не спрашиваем сразу при входе
-      const t = setTimeout(() => show('push'), 3000)
-      return () => clearTimeout(t)
-    }
-  }, [pwa.updateAvailable, pwa.isInstallable, pwa.pushPermission, accessToken])
 
   function show(type: typeof shown) {
     setShown(type)
@@ -88,34 +72,6 @@ export function PWABanner() {
 
   return (
     <Animated.View style={[s.container, { opacity }]}>
-      {shown === 'install' && (
-        <View style={s.banner}>
-          <Text style={s.icon}>📱</Text>
-          <View style={s.text}>
-            <Text style={s.title}>Установить приложение</Text>
-            <Text style={s.sub}>Работает без интернета, быстрее браузера</Text>
-          </View>
-          <View style={s.actions}>
-            <Pressable
-              style={s.btnPrimary}
-              onPress={async () => {
-                hide()
-                await pwa.installPWA()
-              }}>
-              <Text style={s.btnPrimaryText}>Установить</Text>
-            </Pressable>
-            <Pressable
-              style={s.btnGhost}
-              onPress={() => {
-                sessionStorage.setItem('pwa_install_dismissed', '1')
-                hide()
-              }}>
-              <Text style={s.btnGhostText}>Позже</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-
       {shown === 'push' && (
         <View style={s.banner}>
           <Text style={s.icon}>🔔</Text>
@@ -129,7 +85,8 @@ export function PWABanner() {
               onPress={async () => {
                 hide()
                 localStorage.setItem(pushAskedKey, '1')
-                await pwa.requestPushPermission()
+                await new Promise(r => setTimeout(r, 300))
+                await requestPushPermission()
               }}>
               <Text style={s.btnPrimaryText}>Включить</Text>
             </Pressable>
@@ -153,7 +110,7 @@ export function PWABanner() {
             <Text style={s.sub}>Новая версия приложения готова к установке</Text>
           </View>
           <View style={s.actions}>
-            <Pressable style={s.btnPrimary} onPress={pwa.applyUpdate}>
+            <Pressable style={s.btnPrimary} onPress={() => {}}>
               <Text style={s.btnPrimaryText}>Обновить</Text>
             </Pressable>
           </View>
@@ -184,14 +141,12 @@ export function PWABanner() {
 // ─── Хук геолокации (для экранов где нужна позиция) ─────────────────────────
 
 export function usePWALocation() {
-  const { accessToken } = useAuthStore()
-  const pwa = usePWA(API_BASE_URL, accessToken)
   return {
-    location: pwa.location,
-    locationError: pwa.locationError,
-    requestLocation: pwa.requestLocation,
-    startTracking: pwa.startLocationTracking,
-    stopTracking: pwa.stopLocationTracking
+    location: null,
+    locationError: null,
+    requestLocation: async () => null,
+    startTracking: () => {},
+    stopTracking: () => {}
   }
 }
 
