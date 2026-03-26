@@ -1,0 +1,58 @@
+<!--
+  ══════════════════════════════════════════════════════════════════
+  PWA META TAGS — вставить в <head> index.html (Expo Web)
+  ══════════════════════════════════════════════════════════════════
+  В Expo SDK 54 основной HTML файл: web/index.html
+  Если его нет — создать: npx expo customize web/index.html
+  ══════════════════════════════════════════════════════════════════
+-->
+
+<!-- ── PWA Core ──────────────────────────────────────────────── -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0F0F0F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FF6B35" media="(prefers-color-scheme: light)">
+
+<!-- ── iOS Safari — полноэкранный режим ─────────────────────── -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Мастер">
+
+<!-- Иконки для iOS (Add to Home Screen) -->
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png">
+
+<!-- iOS Splash screens — важно для standalone режима -->
+<!-- iPhone 14 Pro Max -->
+<link rel="apple-touch-startup-image"
+  href="/splash/splash-1290x2796.png"
+  media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)">
+<!-- iPhone 14 / 13 / 12 -->
+<link rel="apple-touch-startup-image"
+  href="/splash/splash-1170x2532.png"
+  media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)">
+<!-- iPhone SE -->
+<link rel="apple-touch-startup-image"
+  href="/splash/splash-750x1334.png"
+  media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+<!-- iPad Pro 12.9 -->
+<link rel="apple-touch-startup-image"
+  href="/splash/splash-2048x2732.png"
+  media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)">
+
+<!-- ── Android Chrome ────────────────────────────────────────── -->
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
+
+<!-- ── Общие мобильные мета-теги ─────────────────────────────── -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="msapplication-tap-highlight" content="no">
+
+<!-- ── Open Graph (для шаринга ссылки) ──────────────────────── -->
+<meta property="og:title"       content="Мастер — найти специалиста">
+<meta property="og:description" content="Ремонт, красота, репетиторы и многое другое. AI-подбор, эскроу-оплата.">
+<meta property="og:image"       content="/og-image.png">
+<meta property="og:type"        content="website">
+<meta name="twitter:card"       content="summary_large_image">

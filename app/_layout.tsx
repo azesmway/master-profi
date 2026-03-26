@@ -12,15 +12,18 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Platform, View } from 'react-native'
 import { useColorScheme } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
+import { PWABanner } from '@/components/pwa/PWABanner'
 import { QUERY_KEYS } from '@/constants'
+import { useLocationOrders } from '@/hooks/useLocationOrders'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useSocket } from '@/hooks/useSocket'
 import { selectIsAuthenticated, useAuthStore } from '@/store/authStore'
-import { useLocationOrders } from '@/hooks/useLocationOrders'
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://demo.it-trend.dev/v1'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -112,6 +115,7 @@ function AuthGuard() {
 export default function RootLayout() {
   const colorScheme = useColorScheme()
   const isDark = colorScheme === 'dark'
+  const accessToken = useAuthStore(s => s.accessToken)
 
   const [fontsLoaded, fontError] = useFonts({
     Manrope_400Regular,
@@ -126,6 +130,26 @@ export default function RootLayout() {
   useEffect(() => {
     if (fontsLoaded || fontError) SplashScreen.hideAsync()
   }, [fontsLoaded, fontError])
+
+  useEffect(() => {
+    if (!accessToken || Platform.OS !== 'web') return
+
+    navigator.serviceWorker.ready.then(reg => {
+      reg.pushManager.getSubscription().then(sub => {
+        if (!sub) return
+        fetch(`${API_BASE_URL}/notifications/web-push-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ subscription: sub.toJSON() })
+        })
+          .then(() => console.log('[PWA] push token synced'))
+          .catch(e => console.warn('[PWA] push sync error:', e))
+      })
+    })
+  }, [accessToken]) // срабатывает когда токен появился (после логина)
 
   if (!fontsLoaded && !fontError) return null
 
@@ -153,6 +177,7 @@ export default function RootLayout() {
             <Stack.Screen name="(partner)" />
             <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
           </Stack>
+          <PWABanner />
         </View>
       </GestureHandlerRootView>
     </QueryClientProvider>

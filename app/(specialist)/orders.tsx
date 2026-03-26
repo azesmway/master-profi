@@ -4,12 +4,14 @@ import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { useRouter } from 'expo-router'
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { usePWALocation } from '@/components/pwa/PWABanner'
 import { CATEGORIES, CURRENCIES, QUERY_KEYS } from '@/constants'
+import { getDistance } from '@/hooks/usePWA'
 import type { Order } from '@/types'
 
 // ─── Order Card ──────────────────────────────────────────────────────────────
@@ -63,6 +65,7 @@ const CATEGORY_FILTERS = [{ id: null, name: 'Все' }, ...CATEGORIES.slice(0, 6
 export default function SpecialistOrdersScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  const { location, requestLocation } = usePWALocation()
 
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
@@ -78,7 +81,18 @@ export default function SpecialistOrdersScreen() {
     staleTime: 1000 * 30
   })
 
+  useEffect(() => {
+    requestLocation()
+  }, [])
+
   const filtered = data ?? []
+
+  const sorted = filtered.sort((a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
+    if (!location) return 0
+    const dA = getDistance(location.lat, location.lng, a.lat, a.lng)
+    const dB = getDistance(location.lat, location.lng, b.lat, b.lng)
+    return dA - dB
+  })
 
   return (
     <Screen>
@@ -118,7 +132,7 @@ export default function SpecialistOrdersScreen() {
 
       {/* Orders list */}
       <FlatList
-        data={filtered}
+        data={sorted}
         keyExtractor={item => item.id}
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20, gap: 12 }}
         showsVerticalScrollIndicator={false}
@@ -132,7 +146,7 @@ export default function SpecialistOrdersScreen() {
             tintColor="#FF6B35"
           />
         }
-        ListHeaderComponent={<Text className="text-text-muted dark:text-text-secondary text-sm mb-1">{filtered.length} заказов в вашем городе</Text>}
+        ListHeaderComponent={<Text className="text-text-muted dark:text-text-secondary text-sm mb-1">{sorted.length} заказов в вашем городе</Text>}
         ListEmptyComponent={
           <View className="items-center py-16">
             <Text className="text-5xl mb-4">📭</Text>

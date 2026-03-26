@@ -104,7 +104,7 @@ export default function OtpScreen() {
     active: i === code.length && !verifyMutation.isPending,
     filled: i < code.length
   }))
-
+// className="flex-row gap-3 mt-10 mb-4 justify-center"
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
@@ -120,7 +120,7 @@ export default function OtpScreen() {
             </Text>
           </Animated.View>
 
-          <Animated.View entering={FadeInDown.delay(200).springify()} className="flex-row gap-3 mt-10 mb-4 justify-center">
+          <Animated.View entering={FadeInDown.delay(200).springify()} style={{ flexDirection: 'row', marginTop: 10, marginBottom: 4, justifyContent: 'center' }}>
             {boxes.map((box, i) => (
               <Pressable
                 key={i}

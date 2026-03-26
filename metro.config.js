@@ -12,7 +12,10 @@ config.transformer = {
 config.resolver = {
   ...resolver,
   assetExts: resolver.assetExts.filter(ext => ext !== 'svg'),
-  sourceExts: [...resolver.sourceExts, 'svg']
+  sourceExts: [...resolver.sourceExts, 'svg'],
+  // Убираем mjs из приоритета — Metro будет брать CJS
+  resolverMainFields: ['react-native', 'browser', 'main'],
+  unstable_enablePackageExports: false, // ← ключевое
 }
 
 module.exports = withNativeWind(config, { input: './global.css' })

@@ -1,5 +1,6 @@
+import Alert from '@blazejkustra/react-native-alert'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ActivityIndicator, Alert, Linking, Pressable, Text, View } from 'react-native'
+import { ActivityIndicator, Linking, Pressable, Text, View } from 'react-native'
 
 import { useTheme } from '@/hooks/useTheme'
 import { paymentsService } from '@/services/paymentsService'
