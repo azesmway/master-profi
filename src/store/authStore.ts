@@ -16,6 +16,7 @@ interface AuthStore {
   user: User | null
   accessToken: string | null
   refreshToken: string | null
+  webPushSubscription: string | null
   isLoading: boolean
   isHydrated: boolean
 
@@ -34,6 +35,7 @@ export const useAuthStore = create<AuthStore>()(
       user: null,
       accessToken: null,
       refreshToken: null,
+      webPushSubscription: null,
       isLoading: false,
       isHydrated: false,
 
@@ -45,7 +47,7 @@ export const useAuthStore = create<AuthStore>()(
 
       setLoading: isLoading => set({ isLoading }),
 
-      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+      logout: () => set({ user: null, accessToken: null, refreshToken: null, webPushSubscription: null }),
 
       updateUserRole: role =>
         set(state => ({

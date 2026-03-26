@@ -14,7 +14,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 
-import { API_BASE_URL } from '@/constants'
 import { usePWAContext } from '@/context/PWAContext'
 import { useAuthStore } from '@/store/authStore'
 
@@ -46,13 +45,6 @@ export function PWABanner() {
     if (pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
       const t = setTimeout(() => show('push'), 3000)
       return () => clearTimeout(t)
-    }
-  }, [accessToken, pushPermission])
-
-  useEffect(() => {
-    if (!accessToken) return
-    if (pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
-      setTimeout(() => show('push'), 3000)
     }
   }, [accessToken, pushPermission])
 

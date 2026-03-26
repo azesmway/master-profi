@@ -1,8 +1,7 @@
-import Alert from '@blazejkustra/react-native-alert'
 import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Button, Platform, Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import VoiceInputButton from '@/components/ui/VoiceInputButton'
@@ -13,8 +12,6 @@ import { useAuthStore } from '@/store/authStore'
 
 const WHISPER_URL = process.env.EXPO_PUBLIC_WHISPER_URL ?? 'https://api.it-trend.dev/whisper'
 import Screen from '@components/ui/Screen'
-import { API_BASE_URL } from '@/constants'
-import { usePWA } from '@/hooks/usePWA'
 
 import SpecialistCard from '@/components/client/SpecialistCard'
 import { useTheme } from '@/hooks/useTheme'
@@ -23,7 +20,6 @@ import { makeStyles } from '@/utils/makeStyles'
 
 export default function HomeScreen() {
   const { accessToken } = useAuthStore()
-  const pwa = usePWA(API_BASE_URL, accessToken)
 
   const router = useRouter()
   const token = useAuthStore.getState().accessToken
