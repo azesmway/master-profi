@@ -163,7 +163,6 @@ export function usePWA(apiBaseUrl: string, accessToken?: string | null) {
       setState(s => ({ ...s, pushPermission: permission }))
 
       if (permission !== 'granted') return false
-      Alert.alert('Start requestPushPermission')
       const sub = await subscribePush(swRef.current)
       if (sub) {
         setState(s => ({ ...s, pushSubscription: sub }))
@@ -180,7 +179,6 @@ export function usePWA(apiBaseUrl: string, accessToken?: string | null) {
   const subscribePush = async (reg: ServiceWorkerRegistration): Promise<PushSubscription | null> => {
     Alert.alert('Start subscribePush')
     if (!VAPID_PUBLIC_KEY) {
-      Alert.alert('[PWA] VAPID_PUBLIC_KEY не задан')
       console.warn('[PWA] VAPID_PUBLIC_KEY не задан')
       return null
     }
@@ -194,7 +192,6 @@ export function usePWA(apiBaseUrl: string, accessToken?: string | null) {
       return sub
     } catch (e) {
       // @ts-ignore
-      Alert.alert('Subscribe Error', e.message + '\n' + e.name)
       console.warn('[PWA] Push subscribe error:', e)
       return null
     }

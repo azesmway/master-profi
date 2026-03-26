@@ -18,6 +18,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { PWABanner } from '@/components/pwa/PWABanner'
 import { QUERY_KEYS } from '@/constants'
+import { PWAProvider } from '@/context/PWAContext'
 import { useLocationOrders } from '@/hooks/useLocationOrders'
 import { usePushNotifications } from '@/hooks/usePushNotifications'
 import { useSocket } from '@/hooks/useSocket'
@@ -162,22 +163,24 @@ export default function RootLayout() {
           <AuthGuard />
           <GlobalSocketListener />
           <GlobalPushListener />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(client)" />
-            <Stack.Screen name="(specialist)" />
-            <Stack.Screen name="(admin)" />
-            <Stack.Screen name="specialist" />
-            <Stack.Screen name="order" />
-            <Stack.Screen name="chat" />
-            <Stack.Screen name="create-order" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="ai-chat" />
-            <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
-            <Stack.Screen name="(partner)" />
-            <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
-          </Stack>
-          <PWABanner />
+          <PWAProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(client)" />
+              <Stack.Screen name="(specialist)" />
+              <Stack.Screen name="(admin)" />
+              <Stack.Screen name="specialist" />
+              <Stack.Screen name="order" />
+              <Stack.Screen name="chat" />
+              <Stack.Screen name="create-order" options={{ presentation: 'modal' }} />
+              <Stack.Screen name="ai-chat" />
+              <Stack.Screen name="onboarding" options={{ animation: 'fade' }} />
+              <Stack.Screen name="(partner)" />
+              <Stack.Screen name="partner" options={{ presentation: 'modal' }} />
+            </Stack>
+            <PWABanner />
+          </PWAProvider>
         </View>
       </GestureHandlerRootView>
     </QueryClientProvider>

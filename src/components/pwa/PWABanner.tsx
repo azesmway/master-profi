@@ -15,16 +15,25 @@ import { useEffect, useRef, useState } from 'react'
 import { Animated, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { API_BASE_URL } from '@/constants'
+import { usePWAContext } from '@/context/PWAContext'
 import { usePWA } from '@/hooks/usePWA'
 import { useAuthStore } from '@/store/authStore'
 
 export function PWABanner() {
+  const { pushPermission, requestPushPermission } = usePWAContext()
   const { accessToken } = useAuthStore()
   const pwa = usePWA(API_BASE_URL, accessToken)
 
   const [shown, setShown] = useState<'install' | 'push' | 'update' | null>(null)
   const opacity = useRef(new Animated.Value(0)).current
   const pushAskedKey = 'pwa_push_asked'
+
+  useEffect(() => {
+    if (!accessToken) return
+    if (pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
+      setTimeout(() => show('push'), 3000)
+    }
+  }, [accessToken, pushPermission])
 
   // Определяем что показать
   useEffect(() => {
@@ -58,7 +67,7 @@ export function PWABanner() {
   }
 
   if (Platform.OS !== 'web') return null
-  // if (!shown) return null
+  if (!shown) return null
 
   return (
     <Animated.View style={[s.container, { opacity }]}>
@@ -90,7 +99,7 @@ export function PWABanner() {
         </View>
       )}
 
-      {/*{shown === 'push' && (*/}
+      {shown === 'push' && (
         <View style={s.banner}>
           <Text style={s.icon}>🔔</Text>
           <View style={s.text}>
@@ -117,7 +126,7 @@ export function PWABanner() {
             </Pressable>
           </View>
         </View>
-      {/*)}*/}
+      )}
 
       {shown === 'update' && (
         <View style={s.banner}>
