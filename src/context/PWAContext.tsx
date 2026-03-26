@@ -46,16 +46,17 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   // ── Автоподписка если разрешение уже granted но подписки нет ─────
   useEffect(() => {
     if (!swReady || !accessToken) return
-    if (Notification.permission !== 'granted') return
+    if (Notification.permission !== 'granted') return // ← не трогаем если не granted
     if (pushSubscription) return
 
+    // Здесь НЕ вызываем requestPermission — только восстанавливаем существующую
     swRef.current?.pushManager.getSubscription().then(async sub => {
       if (sub) {
         setPushSubscription(sub)
         return
       }
-      // Нет подписки — создаём
-      const newSub = await subscribePush()
+      // Разрешение есть, но подписки нет — можно подписать без диалога
+      const newSub = await subscribePush() // ← это без диалога, OK
       if (newSub) setPushSubscription(newSub)
     })
   }, [swReady, accessToken])
@@ -81,6 +82,18 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
   const requestPushPermission = useCallback(async (): Promise<boolean> => {
     if (!('Notification' in window)) return false
+
+    // Если уже granted — просто подписываемся без диалога
+    if (Notification.permission === 'granted') {
+      const sub = await subscribePush()
+      if (sub) {
+        setPushSubscription(sub)
+        return true
+      }
+      return false
+    }
+
+    // Диалог — только по user gesture, iOS требует это
     const permission = await Notification.requestPermission()
     setPushPermission(permission)
     if (permission !== 'granted') return false
@@ -91,7 +104,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       return true
     }
     return false
-  }, [swReady, accessToken])
+  }, [swReady])
 
   if (Platform.OS !== 'web') return <>{children}</>
 

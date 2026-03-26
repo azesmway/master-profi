@@ -3,7 +3,6 @@
  * Используется вместо expo-notifications и expo-location на web-платформе
  */
 
-import Alert from '@blazejkustra/react-native-alert'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
@@ -177,7 +176,6 @@ export function usePWA(apiBaseUrl: string, accessToken?: string | null) {
   }, [accessToken])
 
   const subscribePush = async (reg: ServiceWorkerRegistration): Promise<PushSubscription | null> => {
-    Alert.alert('Start subscribePush')
     if (!VAPID_PUBLIC_KEY) {
       console.warn('[PWA] VAPID_PUBLIC_KEY не задан')
       return null

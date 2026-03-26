@@ -24,9 +24,26 @@ export function PWABanner() {
   const { accessToken } = useAuthStore()
   const pwa = usePWA(API_BASE_URL, accessToken)
 
-  const [shown, setShown] = useState<'install' | 'push' | 'update' | null>(null)
+  const [shown, setShown] = useState<'install' | 'push' | 'update' | 'install_ios' | null>(null)
   const opacity = useRef(new Animated.Value(0)).current
   const pushAskedKey = 'pwa_push_asked'
+
+  useEffect(() => {
+    if (!accessToken) return
+
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+
+    if (isIOS && !isStandalone) {
+      // На iOS сначала просим добавить на главный экран
+      show('install_ios')
+      return
+    }
+
+    if (pushPermission === 'default' && !localStorage.getItem(pushAskedKey)) {
+      setTimeout(() => show('push'), 3000)
+    }
+  }, [accessToken, pushPermission])
 
   useEffect(() => {
     if (!accessToken) return
@@ -140,6 +157,24 @@ export function PWABanner() {
               <Text style={s.btnPrimaryText}>Обновить</Text>
             </Pressable>
           </View>
+        </View>
+      )}
+
+      {shown === 'install_ios' && (
+        <View style={s.banner}>
+          <Text style={s.icon}>📲</Text>
+          <View style={s.text}>
+            <Text style={s.title}>Добавьте на главный экран</Text>
+            <Text style={s.sub}>Нажмите Поделиться → «На экран Домой» для получения уведомлений</Text>
+          </View>
+          <Pressable
+            style={s.btnGhost}
+            onPress={() => {
+              sessionStorage.setItem('ios_install_dismissed', '1')
+              hide()
+            }}>
+            <Text style={s.btnGhostText}>Понятно</Text>
+          </Pressable>
         </View>
       )}
     </Animated.View>
