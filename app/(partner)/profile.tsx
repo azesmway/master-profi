@@ -1,6 +1,7 @@
 import Alert from '@blazejkustra/react-native-alert'
 import Screen from '@components/ui/Screen'
-import { useMutation } from '@tanstack/react-query'
+import { performLogout } from '@services/logoutService'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
@@ -17,6 +18,7 @@ export default function PartnerProfileScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { colors } = useTheme()
+  const queryClient = useQueryClient()
   const s = makeStyles(colors)
   const user = useAuthStore(state => state.user)
   const logout = useAuthStore(state => state.logout)
@@ -54,8 +56,8 @@ export default function PartnerProfileScreen() {
       {
         text: 'Выйти',
         style: 'destructive',
-        onPress: () => {
-          logout()
+        onPress: async () => {
+          await performLogout(queryClient)
           router.replace('/(auth)/welcome')
         }
       }

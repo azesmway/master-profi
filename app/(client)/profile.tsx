@@ -1,5 +1,6 @@
 import Alert from '@blazejkustra/react-native-alert'
 import Screen from '@components/ui/Screen'
+import { performLogout } from '@services/logoutService'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import * as ImagePicker from 'expo-image-picker'
@@ -70,8 +71,8 @@ export default function ClientProfileScreen() {
       {
         text: 'Выйти',
         style: 'destructive',
-        onPress: () => {
-          logout()
+        onPress: async () => {
+          await performLogout(queryClient)
           router.replace('/(auth)/welcome')
         }
       }

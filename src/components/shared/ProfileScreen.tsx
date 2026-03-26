@@ -1,4 +1,6 @@
 import { useTheme } from '@hooks/useTheme'
+import { performLogout } from '@services/logoutService'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, Switch, Text, View } from 'react-native'
@@ -13,6 +15,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets()
   const { colors } = useTheme()
   const { user, logout } = useAuthStore()
+  const queryClient = useQueryClient()
   const [notificationsOn, setNotificationsOn] = useState(true)
   const isSpecialist = user?.role === 'specialist'
   const initials =
@@ -63,8 +66,8 @@ export default function ProfileScreen() {
         {
           icon: '🚪',
           label: 'Выйти',
-          onPress: () => {
-            logout()
+          onPress: async () => {
+            await performLogout(queryClient)
             router.replace('/(auth)/welcome')
           },
           danger: true
