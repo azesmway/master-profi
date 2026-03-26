@@ -51,6 +51,9 @@ export function usePushNotifications() {
 }
 
 async function registerForPushNotifications() {
+  // На web используем кастомный Web Push (usePWA) — не Expo
+  if (Platform.OS === 'web') return
+
   if (!Device.isDevice) {
     console.log('[Push] Только на реальном устройстве')
     return

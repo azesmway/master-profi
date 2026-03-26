@@ -19,15 +19,56 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!('serviceWorker' in navigator)) return
 
-    navigator.serviceWorker.ready.then(reg => {
-      swRef.current = reg
-      setSwReady(true)
-      setPushPermission(Notification.permission)
-      // Восстанавливаем существующую подписку
-      reg.pushManager.getSubscription().then(sub => {
-        if (sub) setPushSubscription(sub)
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+
+    // iOS Safari — используем getRegistration вместо .ready
+    if (isIOS) {
+      navigator.serviceWorker
+        .getRegistration('/')
+        .then(reg => {
+          if (!reg) {
+            // Регистрируем сами
+            navigator.serviceWorker
+              .register('/sw.js', { scope: '/' })
+              .then(newReg => {
+                swRef.current = newReg
+                setSwReady(true)
+                setPushPermission(Notification.permission as NotificationPermission)
+              })
+              .catch(e => console.warn('[PWA] SW register error:', e))
+            return
+          }
+          swRef.current = reg
+          setSwReady(true)
+          setPushPermission(Notification.permission as NotificationPermission)
+          reg.pushManager?.getSubscription().then(sub => {
+            if (sub) setPushSubscription(sub)
+          })
+        })
+        .catch(e => console.warn('[PWA] getRegistration error:', e))
+      return
+    }
+
+    // Остальные браузеры — с таймаутом на случай зависания
+    const timeout = setTimeout(() => {
+      console.warn('[PWA] serviceWorker.ready timeout')
+      setSwReady(false)
+    }, 5000)
+
+    navigator.serviceWorker.ready
+      .then(reg => {
+        clearTimeout(timeout)
+        swRef.current = reg
+        setSwReady(true)
+        setPushPermission(Notification.permission as NotificationPermission)
+        reg.pushManager.getSubscription().then(sub => {
+          if (sub) setPushSubscription(sub)
+        })
       })
-    })
+      .catch(e => {
+        clearTimeout(timeout)
+        console.warn('[PWA] SW ready error:', e)
+      })
   }, [])
 
   // ── Синхронизируем токен при появлении accessToken ────────────────

@@ -1,6 +1,6 @@
 // ─── Master PWA Service Worker ──────────────────────────────────────────────
 // Версия кэша — меняй при деплое
-const CACHE_VERSION = 'master-v1.2.5'
+const CACHE_VERSION = 'master-v1.2.15'
 const STATIC_CACHE = `${CACHE_VERSION}-static`
 const API_CACHE = `${CACHE_VERSION}-api`
 

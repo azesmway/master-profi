@@ -39,6 +39,9 @@
         "VIBRATE"
       ]
     },
+    "notification": {
+      "vapidPublicKey": ""
+    },
     "web": {
       "bundler": "metro",
       "output": "static",
