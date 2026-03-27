@@ -79,7 +79,8 @@ export function ThemedInput({ style, ...props }: TextInputProps) {
           paddingHorizontal: 16,
           paddingVertical: 14,
           color: colors.text,
-          fontSize: 14
+          fontSize: 14,
+          outlineStyle: 'none'
         },
         style
       ]}

@@ -328,7 +328,7 @@ export default function SpecialistScreen() {
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={4}
-              style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
 
             <View style={{ flexDirection: 'row', gap: 12 }}>

@@ -142,7 +142,7 @@ export default function OtpScreen() {
             ))}
           </Animated.View>
 
-          <TextInput ref={inputRef} value={code} onChangeText={handleChange} keyboardType="number-pad" maxLength={CODE_LENGTH} autoFocus style={styles.hiddenInput} />
+          <TextInput ref={inputRef} value={code} onChangeText={handleChange} keyboardType="number-pad" maxLength={CODE_LENGTH} autoFocus style={[styles.hiddenInput, { outlineStyle: 'none' }]} />
 
           {verifyMutation.isPending && (
             <View style={styles.loadingRow}>

@@ -150,7 +150,13 @@ export default function BarterCreateOrderScreen() {
           {/* Title */}
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <Text style={[s.textMuted, { marginBottom: 8 }]}>Что нужно сделать? *</Text>
-            <TextInput value={form.title} onChangeText={t => update('title', t)} placeholder="Например: Ремонт сантехники" placeholderTextColor={colors.textMuted} style={s.input} />
+            <TextInput
+              value={form.title}
+              onChangeText={t => update('title', t)}
+              placeholder="Например: Ремонт сантехники"
+              placeholderTextColor={colors.textMuted}
+              style={[s.input, { outlineStyle: 'none' }]}
+            />
             {errors.title && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.title}</Text>}
           </Animated.View>
 
@@ -164,7 +170,7 @@ export default function BarterCreateOrderScreen() {
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 90, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 90, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
             {errors.description && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.description}</Text>}
           </Animated.View>
@@ -179,7 +185,7 @@ export default function BarterCreateOrderScreen() {
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={4}
-              style={[s.input, { height: 110, textAlignVertical: 'top', paddingTop: 12, borderColor: '#8B5CF640', borderWidth: 1.5 }]}
+              style={[s.input, { height: 110, textAlignVertical: 'top', paddingTop: 12, borderColor: '#8B5CF640', borderWidth: 1.5, outlineStyle: 'none' }]}
             />
             {errors.barterClientOffer && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.barterClientOffer}</Text>}
           </Animated.View>
@@ -214,7 +220,13 @@ export default function BarterCreateOrderScreen() {
               <Text style={s.textLabel}>Данные клиента (для партнёра)</Text>
               <View>
                 <Text style={[s.textMuted, { marginBottom: 6 }]}>Имя клиента *</Text>
-                <TextInput value={form.clientName} onChangeText={t => update('clientName', t)} placeholder="Алия Иванова" placeholderTextColor={colors.textMuted} style={s.input} />
+                <TextInput
+                  value={form.clientName}
+                  onChangeText={t => update('clientName', t)}
+                  placeholder="Алия Иванова"
+                  placeholderTextColor={colors.textMuted}
+                  style={[s.input, { outlineStyle: 'none' }]}
+                />
                 {errors.clientName && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.clientName}</Text>}
               </View>
               <View>
@@ -225,7 +237,7 @@ export default function BarterCreateOrderScreen() {
                   placeholder="+7 700 000 0000"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
-                  style={s.input}
+                  style={[s.input, { outlineStyle: 'none' }]}
                 />
               </View>
               <View>

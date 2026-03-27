@@ -78,7 +78,7 @@ export default function RegisterScreen() {
                 autoCapitalize="words"
                 returnKeyType="done"
                 autoFocus
-                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text }]}
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text, outlineStyle: 'none' }]}
               />
             </Animated.View>
 

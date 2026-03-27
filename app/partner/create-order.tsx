@@ -143,7 +143,13 @@ export default function PartnerCreateOrderScreen() {
               {/* Title */}
               <View>
                 <Text style={[s.textMuted, { marginBottom: 8 }]}>Название заказа *</Text>
-                <TextInput value={form.title} onChangeText={t => update('title', t)} placeholder="Например: Установка сантехники" placeholderTextColor={colors.textMuted} style={s.input} />
+                <TextInput
+                  value={form.title}
+                  onChangeText={t => update('title', t)}
+                  placeholder="Например: Установка сантехники"
+                  placeholderTextColor={colors.textMuted}
+                  style={[s.input, { outlineStyle: 'none' }]}
+                />
                 {errors.title && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.title}</Text>}
               </View>
 
@@ -157,7 +163,7 @@ export default function PartnerCreateOrderScreen() {
                   placeholderTextColor={colors.textMuted}
                   multiline
                   numberOfLines={4}
-                  style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12 }]}
+                  style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
                 />
                 {errors.description && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.description}</Text>}
               </View>
@@ -200,14 +206,14 @@ export default function PartnerCreateOrderScreen() {
               {/* Budget */}
               <View>
                 <Text style={[s.textMuted, { marginBottom: 8 }]}>Бюджет клиента (₸) *</Text>
-                <TextInput value={form.budgetFrom} onChangeText={t => update('budgetFrom', t)} placeholder="50000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={s.input} />
+                <TextInput value={form.budgetFrom} onChangeText={t => update('budgetFrom', t)} placeholder="50000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={[s.input, { outlineStyle: 'none' }]} />
                 {errors.budgetFrom && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.budgetFrom}</Text>}
               </View>
 
               {/* Client info */}
               <View>
                 <Text style={[s.textMuted, { marginBottom: 8 }]}>Имя клиента *</Text>
-                <TextInput value={form.clientName} onChangeText={t => update('clientName', t)} placeholder="Алия Иванова" placeholderTextColor={colors.textMuted} style={s.input} />
+                <TextInput value={form.clientName} onChangeText={t => update('clientName', t)} placeholder="Алия Иванова" placeholderTextColor={colors.textMuted} style={[s.input, { outlineStyle: 'none' }]} />
                 {errors.clientName && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.clientName}</Text>}
               </View>
 
@@ -219,7 +225,7 @@ export default function PartnerCreateOrderScreen() {
                   placeholder="+7 700 000 0000"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
-                  style={s.input}
+                  style={[s.input, { outlineStyle: 'none' }]}
                 />
                 {errors.clientPhone && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.clientPhone}</Text>}
               </View>

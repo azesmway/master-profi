@@ -82,7 +82,7 @@ export function PromoCodeInput({ onApplied, onRemoved }: Props) {
           placeholder="Промокод"
           placeholderTextColor={colors.textMuted}
           autoCapitalize="characters"
-          style={[s.input, { flex: 1, fontSize: 14, letterSpacing: 1 }]}
+          style={[s.input, { flex: 1, fontSize: 14, letterSpacing: 1, outlineStyle: 'none' }]}
         />
         <Pressable
           onPress={handleApply}

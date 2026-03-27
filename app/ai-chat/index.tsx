@@ -237,7 +237,7 @@ export default function AiChatScreen() {
               onChangeText={setInput}
               placeholder="Спросите что-нибудь..."
               placeholderTextColor={colors.textMuted}
-              style={{ fontSize: 15, lineHeight: 20, color: colors.text, padding: 0 }}
+              style={{ fontSize: 15, lineHeight: 20, color: colors.text, padding: 0, outlineStyle: 'none' }}
               multiline
               editable={!isLoading}
               onSubmitEditing={() => send(input)}

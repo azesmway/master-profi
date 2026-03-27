@@ -67,7 +67,7 @@ export function BarterResponseModal({ visible, order, onClose, onSubmit, isLoadi
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 90, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 90, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
             {errors.want && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.want}</Text>}
           </View>
@@ -85,7 +85,7 @@ export function BarterResponseModal({ visible, order, onClose, onSubmit, isLoadi
               placeholder="Например: 2000"
               placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
-              style={s.input}
+              style={[s.input, { outlineStyle: 'none' }]}
             />
             {errors.fee && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.fee}</Text>}
           </View>

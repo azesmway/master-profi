@@ -142,7 +142,7 @@ export default function ClientProfileScreen() {
             <View>
               <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Имя</Text>
               {editing ? (
-                <TextInput value={name} onChangeText={setName} style={[s.input, { paddingVertical: 10 }]} placeholderTextColor={colors.textMuted} placeholder="Ваше имя" />
+                <TextInput value={name} onChangeText={setName} style={[s.input, { paddingVertical: 10, outlineStyle: 'none' }]} placeholderTextColor={colors.textMuted} placeholder="Ваше имя" />
               ) : (
                 <Text style={s.textLabel}>{user?.name ?? '—'}</Text>
               )}
@@ -156,7 +156,7 @@ export default function ClientProfileScreen() {
                 <TextInput
                   value={email}
                   onChangeText={setEmail}
-                  style={[s.input, { paddingVertical: 10 }]}
+                  style={[s.input, { paddingVertical: 10, outlineStyle: 'none' }]}
                   placeholderTextColor={colors.textMuted}
                   placeholder="email@example.com"
                   keyboardType="email-address"
@@ -172,7 +172,7 @@ export default function ClientProfileScreen() {
             <View>
               <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Город</Text>
               {editing ? (
-                <TextInput value={city} onChangeText={setCity} style={[s.input, { paddingVertical: 10 }]} placeholderTextColor={colors.textMuted} placeholder="Алматы" />
+                <TextInput value={city} onChangeText={setCity} style={[s.input, { paddingVertical: 10, outlineStyle: 'none' }]} placeholderTextColor={colors.textMuted} placeholder="Алматы" />
               ) : (
                 <Text style={s.textLabel}>{user?.city ?? '—'}</Text>
               )}

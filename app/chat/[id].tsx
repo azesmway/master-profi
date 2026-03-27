@@ -265,7 +265,14 @@ export default function ChatScreen() {
             <Text style={{ fontSize: 22, color: colors.textMuted }}>📎</Text>
           </Pressable>
           <View style={[s.fieldWrap, { backgroundColor: fieldBg }]}>
-            <TextInput value={text} onChangeText={handleTyping} placeholder="Сообщение..." placeholderTextColor={colors.textMuted} style={[s.field, { color: colors.text }]} multiline />
+            <TextInput
+              value={text}
+              onChangeText={handleTyping}
+              placeholder="Сообщение..."
+              placeholderTextColor={colors.textMuted}
+              style={[s.field, { color: colors.text, outlineStyle: 'none' }]}
+              multiline
+            />
           </View>
           <Pressable onPress={send} disabled={!text.trim()} style={[s.sendBtn, { backgroundColor: text.trim() ? '#FF6B35' : fieldBg }]}>
             <Text style={{ fontSize: 14, color: text.trim() ? '#fff' : colors.textMuted, marginLeft: 2 }}>➤</Text>

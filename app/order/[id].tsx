@@ -37,13 +37,13 @@ function ResponseModal({ visible, onClose, onSubmit, isLoading }: { visible: boo
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={4}
-              style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
           </View>
 
           <View>
             <Text style={[s.textMuted, { marginBottom: 8 }]}>Ваша цена (₸) *</Text>
-            <TextInput value={price} onChangeText={setPrice} placeholder="8000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={s.input} />
+            <TextInput value={price} onChangeText={setPrice} placeholder="8000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={[s.input, { outlineStyle: 'none' }]} />
           </View>
 
           <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -133,7 +133,7 @@ function BarterResponseModal({
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
             {errors.message && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.message}</Text>}
           </View>
@@ -151,7 +151,7 @@ function BarterResponseModal({
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12 }]}
+              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
             />
             {errors.want && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.want}</Text>}
           </View>
@@ -169,7 +169,7 @@ function BarterResponseModal({
               placeholder="Например: 2000"
               placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
-              style={s.input}
+              style={[s.input, { outlineStyle: 'none' }]}
             />
             {errors.fee && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.fee}</Text>}
           </View>

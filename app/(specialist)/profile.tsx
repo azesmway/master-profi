@@ -473,14 +473,20 @@ export default function SpecialistProfileScreen() {
                 placeholderTextColor={colors.textMuted}
                 multiline
                 numberOfLines={4}
-                style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 10 }]}
+                style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 10, outlineStyle: 'none' }]}
               />
             </View>
 
             {/* City */}
             <View>
               <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Город</Text>
-              <TextInput value={form.city} onChangeText={v => setForm(f => ({ ...f, city: v }))} placeholder="Алматы" placeholderTextColor={colors.textMuted} style={s.input} />
+              <TextInput
+                value={form.city}
+                onChangeText={v => setForm(f => ({ ...f, city: v }))}
+                placeholder="Алматы"
+                placeholderTextColor={colors.textMuted}
+                style={[s.input, { outlineStyle: 'none' }]}
+              />
             </View>
 
             {/* Response time */}
@@ -491,7 +497,7 @@ export default function SpecialistProfileScreen() {
                 onChangeText={v => setForm(f => ({ ...f, responseTime: v }))}
                 placeholder="в течение 1 часа"
                 placeholderTextColor={colors.textMuted}
-                style={s.input}
+                style={[s.input, { outlineStyle: 'none' }]}
               />
             </View>
 
@@ -505,7 +511,7 @@ export default function SpecialistProfileScreen() {
                   placeholder="от"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
-                  style={[s.input, { flex: 1 }]}
+                  style={[s.input, { flex: 1, outlineStyle: 'none' }]}
                 />
                 <TextInput
                   value={form.priceTo}
@@ -513,7 +519,7 @@ export default function SpecialistProfileScreen() {
                   placeholder="до"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
-                  style={[s.input, { flex: 1 }]}
+                  style={[s.input, { flex: 1, outlineStyle: 'none' }]}
                 />
               </View>
               {/* Price unit */}

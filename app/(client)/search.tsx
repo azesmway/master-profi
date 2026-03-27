@@ -115,7 +115,7 @@ export default function SearchScreen() {
                 }}
                 placeholder="Поиск специалиста или задачи..."
                 placeholderTextColor={colors.textMuted}
-                style={{ flex: 1, color: colors.text, fontSize: 14, paddingVertical: 14 }}
+                style={{ flex: 1, color: colors.text, fontSize: 14, paddingVertical: 14, outlineStyle: 'none' }}
                 returnKeyType="search"
                 autoFocus={!!params.q}
               />

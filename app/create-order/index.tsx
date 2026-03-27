@@ -214,7 +214,17 @@ export default function CreateOrderScreen() {
                   onChangeText={t => update('title', t)}
                   placeholder="Например: Починить кран на кухне"
                   placeholderTextColor={colors.textMuted}
-                  style={{ backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, paddingHorizontal: 16, paddingVertical: 14, color: colors.text, fontSize: 14 }}
+                  style={{
+                    backgroundColor: colors.card,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                    borderRadius: 16,
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                    color: colors.text,
+                    fontSize: 14,
+                    outlineStyle: 'none'
+                  }}
                 />
                 {errors.title && <Text className="text-error text-xs mt-1 ml-1">{errors.title}</Text>}
               </View>
@@ -257,7 +267,8 @@ export default function CreateOrderScreen() {
                     paddingHorizontal: 16,
                     paddingVertical: 14,
                     color: colors.text,
-                    fontSize: 14
+                    fontSize: 14,
+                    outlineStyle: 'none'
                   }}
                 />
                 {errors.description && <Text className="text-error text-xs mt-1 ml-1">{errors.description}</Text>}
@@ -286,7 +297,7 @@ export default function CreateOrderScreen() {
                         placeholder="10 000"
                         placeholderTextColor={colors.textMuted}
                         keyboardType="number-pad"
-                        style={{ flex: 1, color: colors.text, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14 }}
+                        style={{ flex: 1, color: colors.text, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, outlineStyle: 'none' }}
                       />
                     </View>
                     <Pressable
@@ -419,7 +430,8 @@ export default function CreateOrderScreen() {
                       paddingVertical: 14,
                       color: colors.text,
                       fontSize: 14,
-                      textAlignVertical: 'top'
+                      textAlignVertical: 'top',
+                      outlineStyle: 'none'
                     }}
                   />
                 </Animated.View>
