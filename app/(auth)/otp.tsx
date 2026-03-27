@@ -1,17 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import {
-  ActivityIndicator,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View
-} from 'react-native'
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated'
 
 import Screen from '@/components/ui/Screen'
@@ -19,6 +9,8 @@ import { useTheme } from '@/hooks/useTheme'
 import { getApiError } from '@/services/api'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/store/authStore'
+
+import { styles } from './otp.styles'
 
 const CODE_LENGTH = 6
 const RESEND_SECONDS = 60
@@ -34,8 +26,7 @@ export default function OtpScreen() {
   const [countdown, setCountdown] = useState(RESEND_SECONDS)
   const inputRef = useRef<TextInput>(null)
 
-  useEffect(() => {
-  }, [])
+  useEffect(() => {}, [])
 
   useEffect(() => {
     if (countdown <= 0) return
@@ -142,7 +133,7 @@ export default function OtpScreen() {
             ))}
           </Animated.View>
 
-          <TextInput ref={inputRef} value={code} onChangeText={handleChange} keyboardType="number-pad" maxLength={CODE_LENGTH} autoFocus style={[styles.hiddenInput, { outlineStyle: 'none' }]} />
+          <TextInput ref={inputRef} value={code} onChangeText={handleChange} keyboardType="number-pad" maxLength={CODE_LENGTH} autoFocus style={styles.hiddenInput} />
 
           {verifyMutation.isPending && (
             <View style={styles.loadingRow}>
@@ -169,59 +160,3 @@ export default function OtpScreen() {
     </Screen>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { paddingHorizontal: 24, paddingTop: 64 },
-  backBtn: { marginBottom: 32 },
-  backText: { color: '#FF6B35', fontSize: 16 },
-  title: { fontSize: 28, fontWeight: '700', marginBottom: 8 },
-  subtitle: { fontSize: 16 },
-  phoneHighlight: { fontWeight: '600' },
-  boxRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 40,
-    marginBottom: 16,
-    justifyContent: 'center'
-  },
-  box: {
-    width: 48,
-    height: 56,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2
-  },
-  boxChar: { fontSize: 22, fontWeight: '700' },
-  cursor: {
-    width: 2,
-    height: 24,
-    backgroundColor: '#FF6B35',
-    borderRadius: 1
-  },
-  hiddenInput: {
-    position: 'absolute',
-    opacity: 0,
-    width: 0,
-    height: 0
-  },
-  loadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 16
-  },
-  loadingText: { fontSize: 14 },
-  errorText: {
-    color: '#EF4444',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 8
-  },
-  resendRow: { alignItems: 'center', marginTop: 32 },
-  countdownText: { fontSize: 14 },
-  countdownNum: { fontWeight: '600' },
-  resendText: { color: '#FF6B35', fontWeight: '500', fontSize: 14 },
-  pressed: { opacity: 0.6 }
-})

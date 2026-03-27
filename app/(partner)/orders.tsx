@@ -4,11 +4,14 @@ import { useRouter } from 'expo-router'
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { vs } from 'react-native-size-matters'
 
 import { CATEGORIES } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { makeStyles } from '@/utils/makeStyles'
+
+import { partnerOrdersStyles as pos } from './orders.styles'
 
 const STATUS_COLOR: Record<string, { label: string; color: string; bg: string }> = {
   published: { label: 'Опубликован', color: '#3B82F6', bg: '#3B82F620' },
@@ -17,6 +20,8 @@ const STATUS_COLOR: Record<string, { label: string; color: string; bg: string }>
   cancelled: { label: 'Отменён', color: '#6B7280', bg: '#6B728020' },
   pending_review: { label: 'На проверке', color: '#F59E0B', bg: '#F59E0B20' }
 }
+
+// ─── Partner Order Card ───────────────────────────────────────────────────────
 
 function PartnerOrderCard({ item, onPress }: { item: any; onPress: () => void }) {
   const { colors } = useTheme()
@@ -30,51 +35,53 @@ function PartnerOrderCard({ item, onPress }: { item: any; onPress: () => void })
   const partnerNet = partnerEarns - platformCut
 
   return (
-    <Pressable onPress={onPress} style={[s.card, { gap: 12 }]}>
-      {/* Header */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flex: 1, marginRight: 8 }}>
-          <Text style={[s.textLabel, { fontSize: 15 }]} numberOfLines={2}>
+    <Pressable onPress={onPress} style={[s.card, { gap: vs(12) }]}>
+      {/* Header: title + status */}
+      <View style={pos.cardTopRow}>
+        <View style={pos.cardTitleWrap}>
+          <Text style={[pos.cardTitle, { color: colors.text }]} numberOfLines={2}>
             {item.title}
           </Text>
-          {catName ? <Text style={[s.textMuted, { fontSize: 12, marginTop: 2 }]}>{catName}</Text> : null}
+          {catName ? <Text style={[pos.cardCatName, { color: colors.textMuted }]}>{catName}</Text> : null}
         </View>
-        <View style={{ backgroundColor: st.bg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 }}>
-          <Text style={{ color: st.color, fontSize: 11, fontWeight: '700' }}>{st.label}</Text>
+        <View style={[pos.statusBadge, { backgroundColor: st.bg }]}>
+          <Text style={[pos.statusBadgeText, { color: st.color }]}>{st.label}</Text>
         </View>
       </View>
 
       {/* Financials */}
-      <View style={{ backgroundColor: colors.elevated, borderRadius: 12, padding: 12, gap: 6 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={[pos.financialsBox, { backgroundColor: colors.elevated }]}>
+        <View style={pos.finRow}>
           <Text style={s.textMuted}>Сумма заказа</Text>
           <Text style={s.textLabel}>{budget.toLocaleString()} ₸</Text>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={pos.finRow}>
           <Text style={s.textMuted}>Моя комиссия ({item.partnerCommissionPercent}%)</Text>
-          <Text style={{ color: '#FF6B35', fontWeight: '600' }}>{partnerEarns.toLocaleString()} ₸</Text>
+          <Text style={pos.finCommission}>{partnerEarns.toLocaleString()} ₸</Text>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={pos.finRow}>
           <Text style={s.textMuted}>Комиссия платформы</Text>
-          <Text style={{ color: '#EF4444' }}>− {platformCut.toLocaleString()} ₸</Text>
+          <Text style={pos.finPlatformCut}>− {platformCut.toLocaleString()} ₸</Text>
         </View>
-        <View style={{ height: 1, backgroundColor: colors.border }} />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={{ color: '#22C55E', fontWeight: '600' }}>{item.partnerPaid ? '✓ Выплачено' : 'К выплате'}</Text>
-          <Text style={{ color: '#22C55E', fontWeight: '800' }}>{partnerNet.toLocaleString()} ₸</Text>
+        <View style={[pos.finDivider, { backgroundColor: colors.border }]} />
+        <View style={pos.finTotalRow}>
+          <Text style={pos.finTotalLabel}>{item.partnerPaid ? '✓ Выплачено' : 'К выплате'}</Text>
+          <Text style={pos.finTotalValue}>{partnerNet.toLocaleString()} ₸</Text>
         </View>
       </View>
 
       {/* Client info */}
       {item.partnerClientName && (
-        <View style={{ flexDirection: 'row', gap: 16 }}>
-          <Text style={s.textMuted}>👤 {item.partnerClientName}</Text>
-          {item.partnerClientPhone && <Text style={s.textMuted}>📞 {item.partnerClientPhone}</Text>}
+        <View style={pos.clientRow}>
+          <Text style={[pos.clientText, { color: colors.textMuted }]}>👤 {item.partnerClientName}</Text>
+          {item.partnerClientPhone && <Text style={[pos.clientText, { color: colors.textMuted }]}>📞 {item.partnerClientPhone}</Text>}
         </View>
       )}
     </Pressable>
   )
 }
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function PartnerOrdersScreen() {
   const router = useRouter()
@@ -90,14 +97,13 @@ export default function PartnerOrdersScreen() {
 
   const orders = data?.data ?? []
 
-  // Итоговая аналитика
-  const totalBudget = orders.reduce((sum: number, o: any) => sum + (o.budgetFrom ?? 0), 0)
   const totalEarned = orders
     .filter((o: any) => o.partnerPaid)
     .reduce((sum: number, o: any) => {
       const e = Math.floor(((o.budgetFrom ?? 0) * (o.partnerCommissionPercent ?? 0)) / 100)
       return sum + e - Math.floor(e * 0.1)
     }, 0)
+
   const totalPending = orders
     .filter((o: any) => !o.partnerPaid && o.status === 'completed')
     .reduce((sum: number, o: any) => {
@@ -110,64 +116,60 @@ export default function PartnerOrdersScreen() {
       <FlatList
         data={orders}
         keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+        contentContainerStyle={{ paddingBottom: insets.bottom + vs(20) }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refetch} tintColor="#FF6B35" />}
         ListHeaderComponent={
           <>
             {/* Header */}
-            <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={[s.textTitle, { fontSize: 22 }]}>Мои заказы</Text>
+            <View style={pos.listHeader}>
+              <Text style={[pos.listHeaderTitle, { color: colors.text }]}>Мои заказы</Text>
               <Pressable
-                onPress={() => {
-                  // @ts-ignore
-                  router.push('/partner/create-order')
-                }}
-                style={{ backgroundColor: '#FF6B35', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 }}>
-                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}>+ Создать</Text>
+                // @ts-ignore
+                onPress={() => router.push('/partner/create-order')}
+                style={pos.createBtn}>
+                <Text style={pos.createBtnText}>+ Создать</Text>
               </Pressable>
             </View>
 
             {/* Stats */}
-            <Animated.View entering={FadeInDown.delay(50).springify()} style={{ flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 16 }}>
-              <View style={[s.card, { flex: 1, alignItems: 'center', padding: 14 }]}>
-                <Text style={{ color: '#FF6B35', fontWeight: '800', fontSize: 18 }}>{orders.length}</Text>
-                <Text style={[s.textMuted, { fontSize: 11 }]}>Заказов</Text>
+            <Animated.View entering={FadeInDown.delay(50).springify()} style={pos.statsRow}>
+              <View style={[s.card, pos.statCard]}>
+                <Text style={[pos.statValue, { color: '#FF6B35' }]}>{orders.length}</Text>
+                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Заказов</Text>
               </View>
-              <View style={[s.card, { flex: 1, alignItems: 'center', padding: 14 }]}>
-                <Text style={{ color: '#22C55E', fontWeight: '800', fontSize: 18 }}>{totalEarned.toLocaleString()} ₸</Text>
-                <Text style={[s.textMuted, { fontSize: 11 }]}>Получено</Text>
+              <View style={[s.card, pos.statCard]}>
+                <Text style={[pos.statValue, { color: '#22C55E' }]}>{totalEarned.toLocaleString()} ₸</Text>
+                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Получено</Text>
               </View>
-              <View style={[s.card, { flex: 1, alignItems: 'center', padding: 14 }]}>
-                <Text style={{ color: '#F59E0B', fontWeight: '800', fontSize: 18 }}>{totalPending.toLocaleString()} ₸</Text>
-                <Text style={[s.textMuted, { fontSize: 11 }]}>Ожидается</Text>
+              <View style={[s.card, pos.statCard]}>
+                <Text style={[pos.statValue, { color: '#F59E0B' }]}>{totalPending.toLocaleString()} ₸</Text>
+                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Ожидается</Text>
               </View>
             </Animated.View>
           </>
         }
         ListEmptyComponent={
           !isLoading ? (
-            <View style={{ alignItems: 'center', paddingVertical: 48 }}>
-              <Text style={{ fontSize: 48, marginBottom: 12 }}>🤝</Text>
-              <Text style={[s.textTitle, { fontSize: 18, marginBottom: 8 }]}>Нет заказов</Text>
-              <Text style={[s.textMuted, { textAlign: 'center', marginBottom: 20 }]}>Создайте первый заказ от клиента</Text>
+            <View style={pos.emptyWrap}>
+              <Text style={pos.emptyIcon}>🤝</Text>
+              <Text style={[pos.emptyTitle, s.textTitle]}>Нет заказов</Text>
+              <Text style={[pos.emptySubtitle, s.textMuted]}>Создайте первый заказ от клиента</Text>
               <Pressable
-                onPress={() => {
-                  // @ts-ignore
-                  router.push('/partner/create-order')
-                }}
+                // @ts-ignore
+                onPress={() => router.push('/partner/create-order')}
                 style={s.buttonPrimary}>
                 <Text style={s.buttonText}>Создать заказ</Text>
               </Pressable>
             </View>
           ) : (
-            <View style={{ alignItems: 'center', paddingVertical: 48 }}>
+            <View style={pos.emptyWrap}>
               <ActivityIndicator size="large" color="#FF6B35" />
             </View>
           )
         }
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(index * 60).springify()} style={{ paddingHorizontal: 20, marginBottom: 12 }}>
+          <Animated.View entering={FadeInDown.delay(index * 60).springify()} style={pos.cardItem}>
             <PartnerOrderCard item={item} onPress={() => router.push(`/order/${item.id}`)} />
           </Animated.View>
         )}

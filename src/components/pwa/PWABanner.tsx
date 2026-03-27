@@ -175,7 +175,10 @@ export function PWABanner() {
 
 export function usePWALocation() {
   return {
-    location: null,
+    location: {
+      lat: null,
+      lng: null
+    },
     locationError: null,
     requestLocation: async () => null,
     startTracking: () => {},

@@ -4,11 +4,14 @@ import { useRouter } from 'expo-router'
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { CATEGORIES, QUERY_KEYS } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { makeStyles } from '@/utils/makeStyles'
+
+import { responsesStyles as rs } from './responses.styles'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   pending: { label: 'Ожидает', color: '#F59E0B', bg: '#F59E0B20' },
@@ -24,104 +27,79 @@ const ORDER_STATUS: Record<string, string> = {
   pending_review: 'На проверке'
 }
 
+// ─── Response Card ────────────────────────────────────────────────────────────
+
 function ResponseCard({ item, onPress }: { item: any; onPress: () => void }) {
   const { colors } = useTheme()
   const s = makeStyles(colors)
   const order = item.order
   const st = STATUS_CONFIG[item.status] ?? STATUS_CONFIG.pending
-
   const catName = CATEGORIES.find(c => c.id === String(order?.categoryId))?.name ?? ''
 
   return (
     <Animated.View entering={FadeInDown.springify()}>
-      <Pressable onPress={onPress} style={[s.card, { gap: 12 }]}>
-        {/* Header */}
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-          <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={[s.textLabel, { fontSize: 15 }]} numberOfLines={2}>
+      <Pressable onPress={onPress} style={[s.card, { gap: vs(12) }]}>
+        {/* Header: title + status badge */}
+        <View style={rs.cardTopRow}>
+          <View style={rs.cardTitleWrap}>
+            <Text style={[rs.cardTitle, { color: colors.text }]} numberOfLines={2}>
               {order?.title ?? 'Заказ'}
             </Text>
-            {catName ? <Text style={[s.textMuted, { fontSize: 12, marginTop: 2 }]}>{catName}</Text> : null}
+            {catName ? <Text style={[rs.cardCatName, { color: colors.textMuted }]}>{catName}</Text> : null}
           </View>
-          <View style={{ backgroundColor: st.bg, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 }}>
-            <Text style={{ color: st.color, fontSize: 11, fontWeight: '700' }}>{st.label}</Text>
+          <View style={[rs.statusBadge, { backgroundColor: st.bg }]}>
+            <Text style={[rs.statusBadgeText, { color: st.color }]}>{st.label}</Text>
           </View>
         </View>
 
-        {/* Моё предложение */}
-        <View
-          style={{
-            backgroundColor: colors.elevated,
-            borderRadius: 10,
-            padding: 10,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
+        {/* Offer box */}
+        <View style={[rs.offerBox, { backgroundColor: colors.elevated }]}>
           <View>
-            <Text style={[s.textMuted, { fontSize: 11 }]}>Моё предложение</Text>
-            <Text style={[s.textTitle, { fontSize: 18, color: '#FF6B35' }]}>{item.price ? `${Number(item.price).toLocaleString()} ₸` : 'Договорная'}</Text>
+            <Text style={[rs.offerLabel, { color: colors.textMuted }]}>Моё предложение</Text>
+            <Text style={[rs.offerPrice, { fontWeight: '700' }]}>{item.price ? `${Number(item.price).toLocaleString()} ₸` : 'Договорная'}</Text>
           </View>
           {item.deliveryTime && (
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={[s.textMuted, { fontSize: 11 }]}>Срок</Text>
-              <Text style={[s.textSecondary, { fontSize: 13 }]}>{item.deliveryTime}</Text>
+            <View style={rs.deliveryWrap}>
+              <Text style={[rs.deliveryLabel, { color: colors.textMuted }]}>Срок</Text>
+              <Text style={[rs.deliveryValue, { color: colors.textSecondary }]}>{item.deliveryTime}</Text>
             </View>
           )}
         </View>
 
-        {/* Комментарий */}
+        {/* Comment */}
         {item.comment && (
-          <Text style={[s.textSecondary, { fontSize: 13 }]} numberOfLines={2}>
+          <Text style={[rs.comment, { color: colors.textSecondary }]} numberOfLines={2}>
             {item.comment}
           </Text>
         )}
 
-        {/* Footer */}
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+        {/* Footer: budget + date */}
+        <View style={rs.cardFooter}>
+          <View style={rs.cardFooterLeft}>
             {order?.budgetFrom && (
-              <Text style={[s.textMuted, { fontSize: 12 }]}>
+              <Text style={[rs.budgetText, { color: colors.textMuted }]}>
                 💰 Бюджет: {Number(order.budgetFrom).toLocaleString()}
                 {order.budgetTo ? `–${Number(order.budgetTo).toLocaleString()}` : ''} ₸
               </Text>
             )}
           </View>
-          <Text style={[s.textMuted, { fontSize: 11 }]}>
-            {new Date(item.createdAt).toLocaleDateString('ru', {
-              day: 'numeric',
-              month: 'short'
-            })}
-          </Text>
+          <Text style={[rs.dateText, { color: colors.textMuted }]}>{new Date(item.createdAt).toLocaleDateString('ru', { day: 'numeric', month: 'short' })}</Text>
         </View>
 
-        {/* Статус заказа */}
+        {/* Order status */}
         {order?.status && (
-          <View
-            style={{
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              paddingTop: 10,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 6
-            }}>
-            <View
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: 3,
-                backgroundColor: order.status === 'in_progress' ? '#22C55E' : order.status === 'completed' ? '#3B82F6' : colors.border
-              }}
-            />
-            <Text style={[s.textMuted, { fontSize: 12 }]}>Статус заказа: {ORDER_STATUS[order.status] ?? order.status}</Text>
-            {item.status === 'accepted' && <Text style={{ color: '#FF6B35', fontSize: 12, marginLeft: 'auto' }}>Перейти к чату →</Text>}
+          <View style={[rs.orderStatusRow, { borderTopColor: colors.border }]}>
+            <View style={[rs.orderStatusDot, { backgroundColor: order.status === 'in_progress' ? '#22C55E' : order.status === 'completed' ? '#3B82F6' : colors.border }]} />
+            <Text style={[rs.orderStatusText, { color: colors.textMuted }]}>Статус заказа: {ORDER_STATUS[order.status] ?? order.status}</Text>
+            {item.status === 'accepted' && <Text style={rs.chatLink}>Перейти к чату →</Text>}
           </View>
         )}
       </Pressable>
     </Animated.View>
   )
 }
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function SpecialistResponsesScreen() {
   const router = useRouter()
@@ -142,24 +120,18 @@ export default function SpecialistResponsesScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View
-        style={{
-          paddingHorizontal: 20,
-          paddingVertical: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border
-        }}>
-        <Text style={[s.textTitle, { fontSize: 24 }]}>Мои отклики</Text>
+      <View style={[rs.header, { borderBottomColor: colors.border }]}>
+        <Text style={[rs.headerTitle, { color: colors.text }]}>Мои отклики</Text>
         {responses.length > 0 && (
-          <View style={{ flexDirection: 'row', gap: 16, marginTop: 8 }}>
-            <Text style={[s.textMuted, { fontSize: 13 }]}>
-              Всего: <Text style={{ color: colors.text, fontWeight: '600' }}>{responses.length}</Text>
+          <View style={rs.statsRow}>
+            <Text style={[rs.statText, { color: colors.textMuted }]}>
+              Всего: <Text style={[rs.statValue, { color: colors.text }]}>{responses.length}</Text>
             </Text>
-            <Text style={[s.textMuted, { fontSize: 13 }]}>
-              Ожидают: <Text style={{ color: '#F59E0B', fontWeight: '600' }}>{pending}</Text>
+            <Text style={[rs.statText, { color: colors.textMuted }]}>
+              Ожидают: <Text style={[rs.statValue, { color: '#F59E0B' }]}>{pending}</Text>
             </Text>
-            <Text style={[s.textMuted, { fontSize: 13 }]}>
-              Принято: <Text style={{ color: '#22C55E', fontWeight: '600' }}>{accepted}</Text>
+            <Text style={[rs.statText, { color: colors.textMuted }]}>
+              Принято: <Text style={[rs.statValue, { color: '#22C55E' }]}>{accepted}</Text>
             </Text>
           </View>
         )}
@@ -170,11 +142,11 @@ export default function SpecialistResponsesScreen() {
           <ActivityIndicator size="large" color="#FF6B35" />
         </View>
       ) : responses.length === 0 ? (
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
-          <Text style={{ fontSize: 64, marginBottom: 16 }}>📭</Text>
-          <Text style={[s.textTitle, { fontSize: 20, textAlign: 'center' }]}>Нет откликов</Text>
-          <Text style={[s.textMuted, { textAlign: 'center', marginTop: 8, lineHeight: 22 }]}>Откликайтесь на заказы клиентов во вкладке "Заказы"</Text>
-          <Pressable onPress={() => router.push('/(specialist)/orders')} style={[s.buttonPrimary, { marginTop: 24, paddingHorizontal: 32 }]}>
+        <View style={rs.emptyWrap}>
+          <Text style={rs.emptyIcon}>📭</Text>
+          <Text style={[rs.emptyTitle, { color: colors.text }]}>Нет откликов</Text>
+          <Text style={[rs.emptySubtitle, { color: colors.textMuted }]}>Откликайтесь на заказы клиентов во вкладке "Заказы"</Text>
+          <Pressable onPress={() => router.push('/(specialist)/orders')} style={[s.buttonPrimary, { marginTop: vs(24), paddingHorizontal: sm(32) }]}>
             <Text style={s.buttonText}>Найти заказы</Text>
           </Pressable>
         </View>
@@ -182,7 +154,7 @@ export default function SpecialistResponsesScreen() {
         <FlatList
           data={responses}
           keyExtractor={(item: any) => item.id}
-          contentContainerStyle={{ padding: 16, gap: 12 }}
+          contentContainerStyle={{ padding: sm(16), gap: vs(12) }}
           showsVerticalScrollIndicator={false}
           refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#FF6B35" />}
           renderItem={({ item }) => (

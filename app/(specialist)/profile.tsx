@@ -10,12 +10,15 @@ import { useCallback, useState } from 'react'
 import { ActivityIndicator, Modal, Pressable, ScrollView, Switch, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { CATEGORIES, QUERY_KEYS } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import { makeStyles } from '@/utils/makeStyles'
+
+import { profileStyles as ps } from './profile.styles'
 
 // ─── Category picker modal ────────────────────────────────────────────────────
 
@@ -30,36 +33,32 @@ function CategoryModal({ visible, selected, onClose, onSave }: { visible: boolea
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '80%' }}>
-          <Text style={[s.textTitle, { fontSize: 20, marginBottom: 16 }]}>Категории услуг</Text>
+      <View style={ps.modalOverlay}>
+        <View style={[ps.modalSheet, { backgroundColor: colors.card }]}>
+          <Text style={[ps.modalTitle, { color: colors.text }]}>Категории услуг</Text>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 }}>
+            <View style={ps.modalCatGrid}>
               {CATEGORIES.filter(c => c.id !== '12').map(cat => {
                 const isSelected = picked.includes(cat.id)
                 return (
                   <Pressable
                     key={cat.id}
                     onPress={() => toggle(cat.id)}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 6,
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      borderRadius: 12,
-                      backgroundColor: isSelected ? '#FF6B35' : colors.elevated,
-                      borderWidth: 1,
-                      borderColor: isSelected ? '#FF6B35' : colors.border
-                    }}>
+                    style={[
+                      ps.modalCatBtn,
+                      {
+                        backgroundColor: isSelected ? '#FF6B35' : colors.elevated,
+                        borderColor: isSelected ? '#FF6B35' : colors.border
+                      }
+                    ]}>
                     <Text>{cat.icon}</Text>
-                    <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{cat.name}</Text>
+                    <Text style={[ps.modalCatText, { color: isSelected ? '#fff' : colors.text }]}>{cat.name}</Text>
                   </Pressable>
                 )
               })}
             </View>
           </ScrollView>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={ps.modalBtnRow}>
             <Pressable onPress={onClose} style={[s.buttonOutline, { flex: 1 }]}>
               <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Отмена</Text>
             </Pressable>
@@ -78,55 +77,31 @@ function CategoryModal({ visible, selected, onClose, onSave }: { visible: boolea
   )
 }
 
-// ─── Portfolio item ───────────────────────────────────────────────────────────
+// ─── Portfolio grid ───────────────────────────────────────────────────────────
 
 function PortfolioGrid({ items, onAdd, onDelete, isLoading }: { items: any[]; onAdd: () => void; onDelete: (id: string) => void; isLoading: boolean }) {
   const { colors } = useTheme()
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <Text style={{ color: colors.text, fontWeight: '600', fontSize: 16 }}>Портфолио ({items.length})</Text>
-        <Pressable onPress={onAdd} style={{ backgroundColor: '#FF6B3515', borderWidth: 1, borderColor: '#FF6B3540', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
-          {isLoading ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={{ color: '#FF6B35', fontWeight: '600', fontSize: 13 }}>+ Добавить фото</Text>}
+      <View style={ps.portfolioHeader}>
+        <Text style={[ps.portfolioTitle, { color: colors.text }]}>Портфолио ({items.length})</Text>
+        <Pressable onPress={onAdd} style={ps.portfolioAddBtn}>
+          {isLoading ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={ps.portfolioAddText}>+ Добавить фото</Text>}
         </Pressable>
       </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      <View style={ps.portfolioGrid}>
         {items.map(item => (
           <View key={item.id} style={{ position: 'relative' }}>
-            <Image source={{ uri: item.url }} style={{ width: 100, height: 100, borderRadius: 12 }} contentFit="cover" />
-            <Pressable
-              onPress={() => onDelete(item.id)}
-              style={{
-                position: 'absolute',
-                top: 4,
-                right: 4,
-                width: 22,
-                height: 22,
-                borderRadius: 11,
-                backgroundColor: 'rgba(0,0,0,0.6)',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-              <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✕</Text>
+            <Image source={{ uri: item.url }} style={ps.portfolioImage} contentFit="cover" />
+            <Pressable onPress={() => onDelete(item.id)} style={ps.portfolioDeleteBtn}>
+              <Text style={ps.portfolioDeleteText}>✕</Text>
             </Pressable>
           </View>
         ))}
         {items.length === 0 && (
-          <Pressable
-            onPress={onAdd}
-            style={{
-              width: 100,
-              height: 100,
-              borderRadius: 12,
-              borderWidth: 2,
-              borderColor: colors.border,
-              borderStyle: 'dashed',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4
-            }}>
-            <Text style={{ fontSize: 24, color: colors.textMuted }}>📷</Text>
-            <Text style={{ color: colors.textMuted, fontSize: 11 }}>Добавить</Text>
+          <Pressable onPress={onAdd} style={[ps.portfolioEmpty, { borderColor: colors.border }]}>
+            <Text style={[ps.portfolioEmptyIcon, { color: colors.textMuted }]}>📷</Text>
+            <Text style={[ps.portfolioEmptyText, { color: colors.textMuted }]}>Добавить</Text>
           </Pressable>
         )}
       </View>
@@ -134,9 +109,7 @@ function PortfolioGrid({ items, onAdd, onDelete, isLoading }: { items: any[]; on
   )
 }
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
-
-// ─── Verification Section ─────────────────────────────────────────────────────
+// ─── Verification section ─────────────────────────────────────────────────────
 
 function VerificationSection({ specialistId, isVerified }: { specialistId?: string; isVerified?: boolean }) {
   const { colors } = useTheme()
@@ -158,13 +131,12 @@ function VerificationSection({ specialistId, isVerified }: { specialistId?: stri
         multiple: true
       })
       if (result.canceled) return
-
       setUploading(true)
       const fd = new FormData()
       for (const asset of result.assets) {
         fd.append('documents', {
           uri: asset.uri,
-          type: asset.mimeType ?? 'image/jpeg',
+          type: asset.mimeType ?? 'application/octet-stream',
           name: asset.name
         } as any)
       }
@@ -179,50 +151,30 @@ function VerificationSection({ specialistId, isVerified }: { specialistId?: stri
     onError: () => setUploading(false)
   })
 
-  if (isVerified) {
-    return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#3B82F620', alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ fontSize: 22 }}>✓</Text>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={[s.textLabel, { color: '#3B82F6' }]}>Профиль верифицирован</Text>
-          <Text style={[s.textMuted, { fontSize: 12 }]}>Клиенты видят значок ✓ на вашем профиле</Text>
-        </View>
-      </View>
-    )
-  }
-
-  const status = verStatus?.verification?.status
+  const status = verStatus?.status
+  const verified = isVerified || status === 'approved'
 
   return (
-    <View style={{ gap: 12 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Text style={{ fontSize: 20 }}>🔐</Text>
-        <View style={{ flex: 1 }}>
-          <Text style={s.textLabel}>Верификация профиля</Text>
-          <Text style={[s.textMuted, { fontSize: 12 }]}>Повышает доверие клиентов и рейтинг</Text>
+    <View>
+      <View style={ps.verRow}>
+        <Text style={ps.verIcon}>{verified ? '✅' : status === 'pending' ? '⏳' : status === 'rejected' ? '❌' : '🔐'}</Text>
+        <View style={ps.verInfo}>
+          <Text style={[ps.verTitle, { color: colors.text }]}>
+            {verified ? 'Профиль верифицирован' : status === 'pending' ? 'Проверка документов' : status === 'rejected' ? 'Верификация отклонена' : 'Верификация профиля'}
+          </Text>
+          <Text style={[ps.verSubtitle, { color: colors.textSecondary }]}>
+            {verified
+              ? 'Вы получаете больше доверия клиентов'
+              : status === 'pending'
+                ? 'Ожидайте проверки (1-2 дня)'
+                : status === 'rejected'
+                  ? (verStatus?.reason ?? 'Загрузите документы повторно')
+                  : 'Загрузите паспорт или диплом'}
+          </Text>
         </View>
-        {status === 'pending' && (
-          <View style={{ backgroundColor: '#F59E0B20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
-            <Text style={{ color: '#F59E0B', fontSize: 12, fontWeight: '600' }}>На проверке</Text>
-          </View>
-        )}
-        {status === 'rejected' && (
-          <View style={{ backgroundColor: '#EF444420', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 }}>
-            <Text style={{ color: '#EF4444', fontSize: 12, fontWeight: '600' }}>Отклонено</Text>
-          </View>
-        )}
       </View>
-
-      {status === 'rejected' && verStatus?.verification?.comment && (
-        <View style={{ backgroundColor: '#EF444410', borderRadius: 10, padding: 10 }}>
-          <Text style={{ color: '#EF4444', fontSize: 13 }}>{verStatus.verification.comment}</Text>
-        </View>
-      )}
-
-      {status !== 'pending' && (
-        <Pressable onPress={() => applyMutation.mutate()} disabled={applyMutation.isPending || uploading} style={[s.buttonOutline, { borderColor: '#3B82F6' }]}>
+      {!verified && status !== 'pending' && (
+        <Pressable onPress={() => applyMutation.mutate()} disabled={applyMutation.isPending || uploading} style={ps.verBtn}>
           {applyMutation.isPending || uploading ? (
             <ActivityIndicator size="small" color="#3B82F6" />
           ) : (
@@ -234,6 +186,8 @@ function VerificationSection({ specialistId, isVerified }: { specialistId?: stri
   )
 }
 
+// ─── Main Screen ──────────────────────────────────────────────────────────────
+
 export default function SpecialistProfileScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
@@ -241,20 +195,17 @@ export default function SpecialistProfileScreen() {
   const s = makeStyles(colors)
   const queryClient = useQueryClient()
   const user = useAuthStore(state => state.user)
-  const logout = useAuthStore(state => state.logout)
   const setUser = useAuthStore(state => state.setUser)
 
   const [editing, setEditing] = useState(false)
   const [showCatModal, setShowCatModal] = useState(false)
 
-  // Загружаем профиль специалиста
   const { data: specialist, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.SPECIALISTS, 'me'],
     queryFn: () => api.get('/specialists/me').then((r: any) => r.data),
     retry: false
   })
 
-  // Форма редактирования
   const [form, setForm] = useState({
     bio: specialist?.bio ?? '',
     city: specialist?.city ?? user?.city ?? '',
@@ -267,7 +218,6 @@ export default function SpecialistProfileScreen() {
     categoryIds: specialist?.categoryIds ? (typeof specialist.categoryIds === 'string' ? specialist.categoryIds.split(',').map((ss: string) => ss.trim()) : specialist.categoryIds) : ([] as string[])
   })
 
-  // Обновляем форму когда загрузились данные
   const initForm = useCallback(
     (sp: any) => {
       if (!sp) return
@@ -286,7 +236,6 @@ export default function SpecialistProfileScreen() {
     [user?.city]
   )
 
-  // Сохраняем профиль
   const saveMutation = useMutation({
     mutationFn: () =>
       api.patch('/specialists/me', {
@@ -300,56 +249,38 @@ export default function SpecialistProfileScreen() {
     }
   })
 
-  // Загружаем аватар
   const avatarMutation = useMutation({
     mutationFn: async (uri: string) => {
       const fd = new FormData()
       fd.append('avatar', { uri, type: 'image/jpeg', name: 'avatar.jpg' } as any)
-      return api.post('/users/me/avatar', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      return api.post('/users/me/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     },
     onSuccess: (res: any) => setUser(res.data)
   })
 
-  // Добавляем в портфолио
   const portfolioAddMutation = useMutation({
     mutationFn: async (uri: string) => {
       const fd = new FormData()
       fd.append('photo', { uri, type: 'image/jpeg', name: `portfolio-${Date.now()}.jpg` } as any)
-      return api.post('/specialists/me/portfolio', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      })
+      return api.post('/specialists/me/portfolio', fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SPECIALISTS, 'me'] })
   })
 
-  // Удаляем из портфолио
   const portfolioDelMutation = useMutation({
     mutationFn: (id: string) => api.delete(`/specialists/me/portfolio/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.SPECIALISTS, 'me'] })
   })
 
   const pickAvatar = async () => {
-    const r = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8
-    })
+    const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 })
     if (!r.canceled && r.assets[0]) avatarMutation.mutate(r.assets[0].uri)
   }
 
   const pickPortfolio = async () => {
-    const r = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
-      allowsMultipleSelection: true
-    })
+    const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, allowsMultipleSelection: true })
     if (!r.canceled) {
-      for (const asset of r.assets) {
-        await portfolioAddMutation.mutateAsync(asset.uri)
-      }
+      for (const asset of r.assets) await portfolioAddMutation.mutateAsync(asset.uri)
     }
   }
 
@@ -383,55 +314,41 @@ export default function SpecialistProfileScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <Text style={[s.textTitle, { fontSize: 22 }]}>Мой профиль</Text>
+      <View style={[ps.header, { borderBottomColor: colors.border }]}>
+        <Text style={[ps.headerTitle, { color: colors.text }]}>Мой профиль</Text>
         <Pressable
           onPress={() => {
             if (!editing) initForm(specialist)
             setEditing(!editing)
           }}>
-          <Text style={{ color: '#FF6B35', fontWeight: '600' }}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
+          <Text style={ps.editBtn}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
         </Pressable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 20, gap: 16 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: sm(20), gap: vs(16) }}>
         {/* Avatar + info */}
-        <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, { alignItems: 'center', paddingVertical: 24 }]}>
-          <Pressable onPress={pickAvatar} style={{ position: 'relative', marginBottom: 12 }}>
+        <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, ps.avatarCard]}>
+          <Pressable onPress={pickAvatar} style={ps.avatarOuter}>
             {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={{ width: 88, height: 88, borderRadius: 44 }} contentFit="cover" />
+              <Image source={{ uri: user.avatar }} style={ps.avatar} contentFit="cover" />
             ) : (
-              <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: '#FF6B3520', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#FF6B35', fontWeight: '700', fontSize: 32 }}>{initials}</Text>
+              <View style={ps.avatarPlaceholder}>
+                <Text style={ps.avatarInitials}>{initials}</Text>
               </View>
             )}
-            <View
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                width: 28,
-                height: 28,
-                borderRadius: 14,
-                backgroundColor: colors.card,
-                borderWidth: 2,
-                borderColor: colors.bg,
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-              {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={{ fontSize: 14 }}>📷</Text>}
+            <View style={[ps.cameraBtn, { backgroundColor: colors.card, borderColor: colors.bg }]}>
+              {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={ps.cameraIcon}>📷</Text>}
             </View>
           </Pressable>
 
-          <Text style={[s.textTitle, { fontSize: 20 }]}>{name}</Text>
-          <Text style={[s.textMuted, { marginTop: 4 }]}>{user?.phone}</Text>
+          <Text style={[ps.avatarName, { color: colors.text }]}>{name}</Text>
+          <Text style={[ps.avatarPhone, { color: colors.textMuted }]}>{user?.phone}</Text>
+          {catNames ? <Text style={ps.avatarCats}>{catNames}</Text> : null}
 
-          {catNames ? <Text style={{ fontSize: 20, marginTop: 8 }}>{catNames}</Text> : null}
-
-          {/* Онлайн toggle */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 12 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: form.isOnline ? '#22C55E' : colors.textMuted }} />
-            <Text style={[s.textSecondary, { fontSize: 14 }]}>{form.isOnline ? 'Онлайн' : 'Оффлайн'}</Text>
+          {/* Online toggle */}
+          <View style={ps.onlineRow}>
+            <View style={[ps.onlineDot, { backgroundColor: form.isOnline ? '#22C55E' : colors.textMuted }]} />
+            <Text style={[ps.onlineText, { color: colors.textSecondary }]}>{form.isOnline ? 'Онлайн' : 'Оффлайн'}</Text>
             <Switch
               value={form.isOnline}
               onValueChange={v => {
@@ -444,15 +361,15 @@ export default function SpecialistProfileScreen() {
           </View>
 
           {/* Stats */}
-          <View style={{ flexDirection: 'row', gap: 24, marginTop: 16 }}>
+          <View style={ps.statsRow}>
             {[
               { label: 'Рейтинг', value: `★ ${Number(specialist?.rating ?? 0).toFixed(1)}` },
               { label: 'Отзывов', value: String(specialist?.reviewCount ?? 0) },
               { label: 'Заказов', value: String(specialist?.completedOrders ?? 0) }
             ].map((stat, i) => (
-              <View key={i} style={{ alignItems: 'center' }}>
-                <Text style={[s.textTitle, { fontSize: 18, color: '#FF6B35' }]}>{stat.value}</Text>
-                <Text style={[s.textMuted, { fontSize: 12 }]}>{stat.label}</Text>
+              <View key={i} style={ps.statItem}>
+                <Text style={ps.statValue}>{stat.value}</Text>
+                <Text style={[ps.statLabel, { color: colors.textMuted }]}>{stat.label}</Text>
               </View>
             ))}
           </View>
@@ -460,12 +377,12 @@ export default function SpecialistProfileScreen() {
 
         {/* Edit form */}
         {editing && (
-          <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, { gap: 16 }]}>
-            <Text style={[s.textTitle, { fontSize: 16, marginBottom: -4 }]}>Редактирование</Text>
+          <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, { gap: vs(16) }]}>
+            <Text style={[ps.formTitle, { color: colors.text }]}>Редактирование</Text>
 
             {/* Bio */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>О себе</Text>
+              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>О себе</Text>
               <TextInput
                 value={form.bio}
                 onChangeText={v => setForm(f => ({ ...f, bio: v }))}
@@ -473,45 +390,45 @@ export default function SpecialistProfileScreen() {
                 placeholderTextColor={colors.textMuted}
                 multiline
                 numberOfLines={4}
-                style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 10, outlineStyle: 'none' }]}
+                style={[s.input, ps.bioInput, { outlineStyle: 'none' } as any]}
               />
             </View>
 
             {/* City */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Город</Text>
+              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Город</Text>
               <TextInput
                 value={form.city}
                 onChangeText={v => setForm(f => ({ ...f, city: v }))}
                 placeholder="Алматы"
                 placeholderTextColor={colors.textMuted}
-                style={[s.input, { outlineStyle: 'none' }]}
+                style={[s.input, { outlineStyle: 'none' } as any]}
               />
             </View>
 
             {/* Response time */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Время отклика</Text>
+              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Время отклика</Text>
               <TextInput
                 value={form.responseTime}
                 onChangeText={v => setForm(f => ({ ...f, responseTime: v }))}
                 placeholder="в течение 1 часа"
                 placeholderTextColor={colors.textMuted}
-                style={[s.input, { outlineStyle: 'none' }]}
+                style={[s.input, { outlineStyle: 'none' } as any]}
               />
             </View>
 
             {/* Price */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Цена (₸)</Text>
-              <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Цена (₸)</Text>
+              <View style={ps.priceRow}>
                 <TextInput
                   value={form.priceFrom}
                   onChangeText={v => setForm(f => ({ ...f, priceFrom: v }))}
                   placeholder="от"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
-                  style={[s.input, { flex: 1, outlineStyle: 'none' }]}
+                  style={[s.input, { flex: 1, outlineStyle: 'none' } as any]}
                 />
                 <TextInput
                   value={form.priceTo}
@@ -519,11 +436,10 @@ export default function SpecialistProfileScreen() {
                   placeholder="до"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
-                  style={[s.input, { flex: 1, outlineStyle: 'none' }]}
+                  style={[s.input, { flex: 1, outlineStyle: 'none' } as any]}
                 />
               </View>
-              {/* Price unit */}
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <View style={ps.priceUnitRow}>
                 {[
                   { key: 'hour', label: '/час' },
                   { key: 'day', label: '/день' },
@@ -532,13 +448,8 @@ export default function SpecialistProfileScreen() {
                   <Pressable
                     key={u.key}
                     onPress={() => setForm(f => ({ ...f, priceUnit: u.key }))}
-                    style={{
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      borderRadius: 8,
-                      backgroundColor: form.priceUnit === u.key ? '#FF6B35' : colors.elevated
-                    }}>
-                    <Text style={{ color: form.priceUnit === u.key ? '#fff' : colors.textMuted, fontSize: 13 }}>{u.label}</Text>
+                    style={[ps.priceUnitBtn, { backgroundColor: form.priceUnit === u.key ? '#FF6B35' : colors.elevated }]}>
+                    <Text style={[ps.priceUnitText, { color: form.priceUnit === u.key ? '#fff' : colors.textMuted }]}>{u.label}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -546,8 +457,8 @@ export default function SpecialistProfileScreen() {
 
             {/* Categories */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Категории услуг</Text>
-              <Pressable onPress={() => setShowCatModal(true)} style={[s.input, { justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }]}>
+              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Категории услуг</Text>
+              <Pressable onPress={() => setShowCatModal(true)} style={[s.input, ps.categoryPicker]}>
                 <Text style={{ color: form.categoryIds.length > 0 ? colors.text : colors.textMuted }}>
                   {form.categoryIds.length > 0
                     ? form.categoryIds
@@ -586,12 +497,12 @@ export default function SpecialistProfileScreen() {
             { icon: '🔔', label: 'Уведомления', onPress: () => {} }
           ].map((item, i, arr) => (
             <View key={i}>
-              <Pressable onPress={item.onPress} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: 12 }}>
-                <Text style={{ fontSize: 20 }}>{item.icon}</Text>
-                <Text style={[s.textLabel, { flex: 1 }]}>{item.label}</Text>
-                <Text style={s.textMuted}>›</Text>
+              <Pressable onPress={item.onPress} style={ps.menuRow}>
+                <Text style={ps.menuIcon}>{item.icon}</Text>
+                <Text style={[ps.menuLabel, { color: colors.text }]}>{item.label}</Text>
+                <Text style={[ps.menuArrow, { color: colors.textMuted }]}>›</Text>
               </Pressable>
-              {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: colors.border }} />}
+              {i < arr.length - 1 && <View style={[ps.menuDivider, { backgroundColor: colors.border }]} />}
             </View>
           ))}
         </Animated.View>

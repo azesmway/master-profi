@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native'
+import { s, vs } from 'react-native-size-matters'
 
 import { COLORS } from '@/hooks/useTheme'
 
@@ -18,14 +19,14 @@ export function makeStyles(colors: typeof COLORS.light | typeof COLORS.dark) {
     },
     card: {
       backgroundColor: colors.card,
-      borderRadius: 16,
+      borderRadius: s(16),
       borderWidth: 1,
       borderColor: colors.border,
-      padding: 16
+      padding: s(16)
     },
     elevated: {
       backgroundColor: colors.elevated,
-      borderRadius: 12,
+      borderRadius: s(12),
       borderWidth: 1,
       borderColor: colors.border
     },
@@ -41,24 +42,24 @@ export function makeStyles(colors: typeof COLORS.light | typeof COLORS.dark) {
     // ─── Текст ────────────────────────────────────────────────────
     textPrimary: {
       color: colors.text,
-      fontSize: 16
+      fontSize: s(16)
     },
     textSecondary: {
       color: colors.textSecondary,
-      fontSize: 14
+      fontSize: s(14)
     },
     textMuted: {
       color: colors.textMuted,
-      fontSize: 12
+      fontSize: s(12)
     },
     textTitle: {
       color: colors.text,
-      fontSize: 20,
+      fontSize: s(20),
       fontWeight: '700'
     },
     textLabel: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: s(14),
       fontWeight: '600'
     },
 
@@ -67,31 +68,31 @@ export function makeStyles(colors: typeof COLORS.light | typeof COLORS.dark) {
       backgroundColor: colors.card,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 16,
-      paddingHorizontal: 16,
-      paddingVertical: 14,
+      borderRadius: s(16),
+      paddingHorizontal: s(16),
+      paddingVertical: vs(14),
       color: colors.text,
-      fontSize: 14
+      fontSize: s(14)
     },
 
     // ─── Кнопки ───────────────────────────────────────────────────
     buttonPrimary: {
       backgroundColor: '#FF6B35',
-      borderRadius: 16,
-      paddingVertical: 16,
+      borderRadius: s(16),
+      paddingVertical: vs(16),
       alignItems: 'center' as const
     },
     buttonOutline: {
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 16,
-      paddingVertical: 16,
+      borderRadius: s(16),
+      paddingVertical: vs(16),
       alignItems: 'center' as const
     },
     buttonText: {
       color: '#FFFFFF',
-      fontSize: 16,
-      paddingHorizontal: 20,
+      fontSize: s(16),
+      paddingHorizontal: s(20),
       fontWeight: '700' as const
     },
 
@@ -101,15 +102,15 @@ export function makeStyles(colors: typeof COLORS.light | typeof COLORS.dark) {
       backgroundColor: colors.card,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      paddingHorizontal: 8,
-      paddingTop: 8
+      paddingHorizontal: s(8),
+      paddingTop: vs(8)
     },
     header: {
       backgroundColor: colors.bg,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
-      paddingHorizontal: 20,
-      paddingVertical: 12,
+      paddingHorizontal: s(20),
+      paddingVertical: vs(12),
       flexDirection: 'row' as const,
       alignItems: 'center' as const
     }

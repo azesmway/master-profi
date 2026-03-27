@@ -8,18 +8,22 @@ import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import { makeStyles } from '@/utils/makeStyles'
 
+import { partnerProfileStyles as pp } from './profile.styles'
+
 export default function PartnerProfileScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { colors } = useTheme()
-  const queryClient = useQueryClient()
   const s = makeStyles(colors)
+  const queryClient = useQueryClient()
+
   const user = useAuthStore(state => state.user)
   const setUser = useAuthStore(state => state.setUser)
 
@@ -45,7 +49,12 @@ export default function PartnerProfileScreen() {
   })
 
   const pickAvatar = async () => {
-    const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 })
+    const r = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8
+    })
     if (!r.canceled && r.assets[0]) avatarMutation.mutate(r.assets[0].uri)
   }
 
@@ -72,68 +81,59 @@ export default function PartnerProfileScreen() {
 
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 40 }} showsVerticalScrollIndicator={false}>
-        <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + vs(40) }} showsVerticalScrollIndicator={false}>
+        <View style={{ paddingHorizontal: sm(20), paddingTop: vs(16) }}>
           {/* Header */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <Text style={[s.textTitle, { fontSize: 24 }]}>Профиль</Text>
+          <View style={pp.pageHeader}>
+            <Text style={[pp.pageTitle, { color: colors.text }]}>Профиль</Text>
             <Pressable onPress={() => setEditing(!editing)}>
-              <Text style={{ color: '#FF6B35', fontWeight: '600' }}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
+              <Text style={pp.editBtn}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
             </Pressable>
           </View>
 
-          {/* Partner badge */}
-          <View style={{ alignItems: 'center', marginBottom: 24 }}>
-            <Pressable onPress={pickAvatar} style={{ position: 'relative' }}>
+          {/* Avatar */}
+          <View style={pp.avatarSection}>
+            <Pressable onPress={pickAvatar} style={pp.avatarOuter}>
               {user?.avatar ? (
-                <Image source={{ uri: user.avatar }} style={{ width: 100, height: 100, borderRadius: 50 }} contentFit="cover" />
+                <Image source={{ uri: user.avatar }} style={pp.avatar} contentFit="cover" />
               ) : (
-                <View style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: '#10B981', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 36, fontWeight: '700' }}>{initials}</Text>
+                <View style={pp.avatarPlaceholder}>
+                  <Text style={pp.avatarInitials}>{initials}</Text>
                 </View>
               )}
-              <View
-                style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  right: 0,
-                  width: 28,
-                  height: 28,
-                  borderRadius: 14,
-                  backgroundColor: colors.card,
-                  borderWidth: 2,
-                  borderColor: colors.bg,
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={{ fontSize: 14 }}>📷</Text>}
+              <View style={[pp.cameraBtn, { backgroundColor: colors.card, borderColor: colors.bg }]}>
+                {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={pp.cameraIcon}>📷</Text>}
               </View>
             </Pressable>
-            <Text style={[s.textTitle, { marginTop: 12, fontSize: 20 }]}>{user?.name}</Text>
-            <Text style={[s.textMuted, { marginTop: 4 }]}>{user?.phone}</Text>
-            <View style={{ backgroundColor: '#10B98120', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, marginTop: 8 }}>
-              <Text style={{ color: '#10B981', fontWeight: '700', fontSize: 13 }}>🤝 Партнёр</Text>
+            <Text style={[pp.avatarName, { color: colors.text }]}>{user?.name}</Text>
+            <Text style={[pp.avatarPhone, { color: colors.textMuted }]}>{user?.phone}</Text>
+            <View style={pp.partnerBadge}>
+              <Text style={pp.partnerBadgeText}>🤝 Партнёр</Text>
             </View>
           </View>
 
-          {/* Info */}
-          <View style={[s.card, { gap: 16 }]}>
+          {/* Info card */}
+          <View style={[s.card, pp.infoCard]}>
+            {/* Имя */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Имя</Text>
+              <Text style={[pp.fieldLabel, { color: colors.textMuted }]}>Имя</Text>
               {editing ? (
-                <TextInput value={name} onChangeText={setName} style={[s.input, { paddingVertical: 10, outlineStyle: 'none' }]} placeholderTextColor={colors.textMuted} placeholder="Ваше имя" />
+                <TextInput value={name} onChangeText={setName} style={[s.input, pp.fieldInput, { outlineStyle: 'none' } as any]} placeholderTextColor={colors.textMuted} placeholder="Ваше имя" />
               ) : (
-                <Text style={s.textLabel}>{user?.name ?? '—'}</Text>
+                <Text style={[pp.fieldValue, { color: colors.text }]}>{user?.name ?? '—'}</Text>
               )}
             </View>
+
+            {/* Город */}
             <View>
-              <Text style={[s.textMuted, { fontSize: 12, marginBottom: 6 }]}>Город</Text>
+              <Text style={[pp.fieldLabel, { color: colors.textMuted }]}>Город</Text>
               {editing ? (
-                <TextInput value={city} onChangeText={setCity} style={[s.input, { paddingVertical: 10, outlineStyle: 'none' }]} placeholderTextColor={colors.textMuted} placeholder="Алматы" />
+                <TextInput value={city} onChangeText={setCity} style={[s.input, pp.fieldInput, { outlineStyle: 'none' } as any]} placeholderTextColor={colors.textMuted} placeholder="Алматы" />
               ) : (
-                <Text style={s.textLabel}>{user?.city ?? '—'}</Text>
+                <Text style={[pp.fieldValue, { color: colors.text }]}>{user?.city ?? '—'}</Text>
               )}
             </View>
+
             {editing && (
               <Pressable onPress={() => updateMutation.mutate()} disabled={updateMutation.isPending} style={s.buttonPrimary}>
                 {updateMutation.isPending ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>Сохранить</Text>}
@@ -142,7 +142,7 @@ export default function PartnerProfileScreen() {
           </View>
 
           {/* Menu */}
-          <View style={[s.card, { gap: 0, marginTop: 16 }]}>
+          <View style={[s.card, pp.menuCard]}>
             {[
               // @ts-ignore
               { icon: '📋', label: 'Мои заказы', onPress: () => router.push('/(partner)/orders') },
@@ -152,18 +152,19 @@ export default function PartnerProfileScreen() {
               { icon: '🎁', label: 'Пригласить партнёра — 500 ₸', onPress: () => router.push('/referral') }
             ].map((item, i, arr) => (
               <View key={i}>
-                <Pressable onPress={item.onPress} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 14, gap: 12 }}>
-                  <Text style={{ fontSize: 20 }}>{item.icon}</Text>
-                  <Text style={[s.textLabel, { flex: 1 }]}>{item.label}</Text>
-                  <Text style={s.textMuted}>›</Text>
+                <Pressable onPress={item.onPress} style={pp.menuRow}>
+                  <Text style={pp.menuIcon}>{item.icon}</Text>
+                  <Text style={[pp.menuLabel, { color: colors.text }]}>{item.label}</Text>
+                  <Text style={[pp.menuArrow, { color: colors.textMuted }]}>›</Text>
                 </Pressable>
-                {i < arr.length - 1 && <View style={{ height: 1, backgroundColor: colors.border }} />}
+                {i < arr.length - 1 && <View style={[pp.menuDivider, { backgroundColor: colors.border }]} />}
               </View>
             ))}
           </View>
 
-          <Pressable onPress={handleLogout} style={[s.buttonOutline, { marginTop: 24, borderColor: '#EF4444' }]}>
-            <Text style={{ color: '#EF4444', fontWeight: '600' }}>Выйти из аккаунта</Text>
+          {/* Logout */}
+          <Pressable onPress={handleLogout} style={[s.buttonOutline, pp.logoutBtn]}>
+            <Text style={pp.logoutText}>Выйти из аккаунта</Text>
           </Pressable>
         </View>
       </ScrollView>

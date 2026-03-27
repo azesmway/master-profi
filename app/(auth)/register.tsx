@@ -12,6 +12,8 @@ import { authService } from '@/services/authService'
 import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types'
 
+import { styles } from './register.styles'
+
 const ROLES: Array<{ role: UserRole; title: string; desc: string; icon: string }> = [
   { role: 'client', title: 'Ищу специалиста', desc: 'Создаю заказы, нахожу мастеров', icon: '🔍' },
   { role: 'specialist', title: 'Я специалист', desc: 'Принимаю заказы, предлагаю услуги', icon: '🛠️' },
@@ -78,7 +80,7 @@ export default function RegisterScreen() {
                 autoCapitalize="words"
                 returnKeyType="done"
                 autoFocus
-                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text, outlineStyle: 'none' }]}
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text }]}
               />
             </Animated.View>
 
@@ -141,83 +143,3 @@ export default function RegisterScreen() {
     </Screen>
   )
 }
-
-const styles = StyleSheet.create({
-  container: { paddingHorizontal: 24, paddingTop: 64 },
-  title: { fontSize: 28, fontWeight: '700', marginBottom: 8 },
-  subtitle: { fontSize: 16, marginBottom: 32 },
-  section: { marginBottom: 24 },
-  label: { fontSize: 13, fontWeight: '500', marginBottom: 8, marginLeft: 4 },
-  input: {
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
-    fontSize: 16
-  },
-  roleList: { gap: 12 },
-  roleItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1
-  },
-  roleItemActive: {
-    backgroundColor: 'rgba(255,107,53,0.08)',
-    borderColor: '#FF6B35'
-  },
-  roleIcon: { fontSize: 28 },
-  roleText: { flex: 1 },
-  roleTitle: { fontSize: 15, fontWeight: '600' },
-  roleDesc: { fontSize: 13, marginTop: 2 },
-  radioOuter: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  radioOuterActive: { borderColor: '#FF6B35' },
-  radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#FF6B35'
-  },
-  cityPicker: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 20
-  },
-  cityText: { fontSize: 16 },
-  cityDropdown: {
-    borderWidth: 1,
-    borderRadius: 16,
-    marginTop: 8,
-    overflow: 'hidden'
-  },
-  cityOption: {
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderBottomWidth: 1
-  },
-  cityOptionActive: { backgroundColor: 'rgba(255,107,53,0.08)' },
-  cityOptionText: { fontSize: 15 },
-  errorText: { color: '#EF4444', fontSize: 14, marginBottom: 16, marginLeft: 4 },
-  submitBtn: {
-    backgroundColor: '#FF6B35',
-    paddingVertical: 16,
-    borderRadius: 16,
-    alignItems: 'center'
-  },
-  disabledBtn: { opacity: 0.4 },
-  pressed: { opacity: 0.8 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '700' }
-})

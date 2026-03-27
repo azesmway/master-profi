@@ -8,49 +8,59 @@ import { useEffect, useState } from 'react'
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { usePWALocation } from '@/components/pwa/PWABanner'
 import { CATEGORIES, CURRENCIES, QUERY_KEYS } from '@/constants'
 import { getDistance } from '@/hooks/usePWA'
+import { useTheme } from '@/hooks/useTheme'
 import type { Order } from '@/types'
+
+import { ordersStyles as os } from './orders.styles'
 
 // ─── Order Card ──────────────────────────────────────────────────────────────
 
 function OrderCard({ order, onPress }: { order: Order; onPress: () => void }) {
+  const { colors } = useTheme()
   const { title, description, category, budget, location, createdAt, responseCount } = order
   const timeAgo = format(new Date(createdAt), 'dd MMM, HH:mm', { locale: ru })
   const currency = budget ? CURRENCIES[budget.currency].symbol : null
   const unitLabel = budget?.unit === 'hour' ? '/час' : budget?.unit === 'day' ? '/день' : ''
 
   return (
-    <Pressable onPress={onPress} className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl p-4 active:opacity-80">
-      <View className="flex-row items-start justify-between mb-2">
-        <View className="flex-row items-center gap-2 flex-1 mr-3">
-          <Text className="text-lg">{category && category.icon ? category.icon : '🔑'}</Text>
-          <Text className="text-text-muted dark:text-text-secondary text-xs">{category && category.name ? category.name : 'Без названия'}</Text>
+    <Pressable onPress={onPress} style={({ pressed }) => [os.card, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}>
+      {/* Top row: category + time */}
+      <View style={os.cardTopRow}>
+        <View style={os.cardCatRow}>
+          <Text style={os.cardCatIcon}>{category?.icon ?? '🔑'}</Text>
+          <Text style={[os.cardCatName, { color: colors.textSecondary }]}>{category?.name ?? 'Без названия'}</Text>
         </View>
-        <Text className="text-text-muted dark:text-text-secondary text-xs">{timeAgo}</Text>
+        <Text style={[os.cardTime, { color: colors.textSecondary }]}>{timeAgo}</Text>
       </View>
 
-      <Text className="text-dark dark:text-white font-semibold text-base mb-1">{title}</Text>
-      <Text className="text-text-muted dark:text-text-secondary text-sm mb-3" numberOfLines={2}>
+      {/* Title */}
+      <Text style={[os.cardTitle, { color: colors.text }]}>{title}</Text>
+
+      {/* Description */}
+      <Text style={[os.cardDesc, { color: colors.textSecondary }]} numberOfLines={2}>
         {description}
       </Text>
 
-      <View className="flex-row items-center justify-between">
-        <View className="flex-row items-center gap-3">
-          <Text className="text-text-muted dark:text-text-secondary text-xs">📍 {location && location.city ? location.city : '- Нет -'}</Text>
+      {/* Footer */}
+      <View style={os.cardFooter}>
+        <View style={os.cardFooterLeft}>
+          <Text style={[os.cardCity, { color: colors.textSecondary }]}>📍 {location?.city ?? '- Нет -'}</Text>
           {responseCount > 0 && (
-            <View className="bg-primary/10 px-2 py-0.5 rounded-md">
-              <Text className="text-primary text-xs font-medium">{responseCount} откликов</Text>
+            <View style={os.cardResponseBadge}>
+              <Text style={os.cardResponseText}>{responseCount} откликов</Text>
             </View>
           )}
         </View>
         {budget && (
-          <Text className="text-dark dark:text-white font-semibold text-sm">
+          <Text style={[os.cardBudget, { color: colors.text }]}>
             {budget.from.toLocaleString()}–{budget.to?.toLocaleString() ?? '?'}
             {currency}
-            <Text className="text-text-muted dark:text-text-secondary text-xs font-normal">{unitLabel}</Text>
+            <Text style={os.cardBudgetUnit}>{unitLabel}</Text>
           </Text>
         )}
       </View>
@@ -60,11 +70,12 @@ function OrderCard({ order, onPress }: { order: Order; onPress: () => void }) {
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
-const CATEGORY_FILTERS = [{ id: null, name: 'Все' }, ...CATEGORIES.slice(0, 6)]
+const CATEGORY_FILTERS = [{ id: null, name: 'Все', icon: null }, ...CATEGORIES.slice(0, 6)]
 
 export default function SpecialistOrdersScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  const { colors } = useTheme()
   const { location, requestLocation } = usePWALocation()
 
   const [activeCat, setActiveCat] = useState<string | null>(null)
@@ -72,12 +83,7 @@ export default function SpecialistOrdersScreen() {
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: [QUERY_KEYS.ORDERS, 'feed', activeCat],
-    queryFn: () =>
-      ordersService
-        .findAll({
-          categoryId: activeCat || undefined
-        })
-        .then((r: any) => r.data.data),
+    queryFn: () => ordersService.findAll({ categoryId: activeCat || undefined }).then((r: any) => r.data.data),
     staleTime: 1000 * 30
   })
 
@@ -88,7 +94,7 @@ export default function SpecialistOrdersScreen() {
   const filtered = data ?? []
 
   const sorted = filtered.sort((a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
-    if (!location.lat || !location.lng) return 0
+    if (!location || !location.lat || !location.lng) return 0
     const dA = getDistance(location.lat, location.lng, a.lat, a.lng)
     const dB = getDistance(location.lat, location.lng, b.lat, b.lng)
     return dA - dB
@@ -97,33 +103,36 @@ export default function SpecialistOrdersScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View className="px-5 pt-4 pb-4 flex-row items-center justify-between">
-        <Text className="text-dark dark:text-white text-2xl font-bold">Лента заказов</Text>
-        <View className="flex-row items-center gap-2">
-          <View className="w-2 h-2 rounded-full bg-success" />
-          <Text className="text-success text-sm font-medium">Вы онлайн</Text>
+      <View style={os.header}>
+        <Text style={[os.headerTitle, { color: colors.text }]}>Лента заказов</Text>
+        <View style={os.onlineRow}>
+          <View style={os.onlineDot} />
+          <Text style={os.onlineText}>Вы онлайн</Text>
         </View>
       </View>
 
       {/* Category filter */}
-      <View className="mb-3">
+      <View style={os.filterWrap}>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
           data={CATEGORY_FILTERS as any[]}
           keyExtractor={item => item.id ?? 'all'}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 8 }}
+          contentContainerStyle={{ paddingHorizontal: sm(20), gap: sm(8) }}
           renderItem={({ item }) => {
             const isActive = item.id === activeCat
             return (
               <Pressable
                 onPress={() => setActiveCat(item.id ?? null)}
-                className={[
-                  'flex-row items-center gap-1.5 px-3 py-2 rounded-xl border',
-                  isActive ? 'bg-primary border-primary' : 'bg-light-card dark:bg-dark-card border-light-border dark:border-dark-border'
-                ].join(' ')}>
-                {item.icon && <Text className="text-sm">{item.icon}</Text>}
-                <Text className={['text-sm font-medium', isActive ? 'text-white' : 'text-text-muted dark:text-text-secondary'].join(' ')}>{item.name}</Text>
+                style={[
+                  os.catChip,
+                  {
+                    backgroundColor: isActive ? '#FF6B35' : colors.card,
+                    borderColor: isActive ? '#FF6B35' : colors.border
+                  }
+                ]}>
+                {item.icon && <Text style={os.catChipIcon}>{item.icon}</Text>}
+                <Text style={[os.catChipText, { color: isActive ? '#fff' : colors.textSecondary }]}>{item.name}</Text>
               </Pressable>
             )
           }}
@@ -134,7 +143,7 @@ export default function SpecialistOrdersScreen() {
       <FlatList
         data={sorted}
         keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20, gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: sm(20), paddingBottom: vs(20), gap: vs(12) }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -146,12 +155,12 @@ export default function SpecialistOrdersScreen() {
             tintColor="#FF6B35"
           />
         }
-        ListHeaderComponent={<Text className="text-text-muted dark:text-text-secondary text-sm mb-1">{sorted.length} заказов в вашем городе</Text>}
+        ListHeaderComponent={<Text style={[os.listHeader, { color: colors.textSecondary }]}>{sorted.length} заказов в вашем городе</Text>}
         ListEmptyComponent={
-          <View className="items-center py-16">
-            <Text className="text-5xl mb-4">📭</Text>
-            <Text className="text-dark dark:text-white text-lg font-semibold mb-2">Нет заказов</Text>
-            <Text className="text-text-muted dark:text-text-secondary text-sm text-center">В этой категории пока нет активных заказов</Text>
+          <View style={os.emptyWrap}>
+            <Text style={os.emptyIcon}>📭</Text>
+            <Text style={[os.emptyTitle, { color: colors.text }]}>Нет заказов</Text>
+            <Text style={[os.emptySubtitle, { color: colors.textSecondary }]}>В этой категории пока нет активных заказов</Text>
           </View>
         }
         renderItem={({ item, index }) => (

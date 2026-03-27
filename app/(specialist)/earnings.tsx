@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { ActivityIndicator, Dimensions, Pressable, ScrollView, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { makeStyles } from '@/utils/makeStyles'
+
+import { earningsStyles as es } from './earnings.styles'
 
 const { width } = Dimensions.get('window')
 const COMMISSION = 0.08
@@ -22,22 +25,22 @@ function MiniChart({ data, colors }: { data: { date: string; amount: number }[];
 
   return (
     <View>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', height: 80, gap: 3 }}>
+      <View style={es.chartBarsRow}>
         {data.slice(-20).map((d, i) => (
           <View
             key={i}
             style={{
               width: Math.max(barW - 3, 4),
-              height: Math.max((d.amount / maxVal) * 80, 4),
-              borderRadius: 3,
+              height: Math.max((d.amount / maxVal) * vs(80), 4),
+              borderRadius: sm(3),
               backgroundColor: d.amount > 0 ? '#FF6B35' : colors.border
             }}
           />
         ))}
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 }}>
-        <Text style={{ color: colors.textMuted, fontSize: 11 }}>{data[0]?.date?.slice(5) ?? ''}</Text>
-        <Text style={{ color: colors.textMuted, fontSize: 11 }}>{data[data.length - 1]?.date?.slice(5) ?? ''}</Text>
+      <View style={es.chartDatesRow}>
+        <Text style={[es.chartDateText, { color: colors.textMuted }]}>{data[0]?.date?.slice(5) ?? ''}</Text>
+        <Text style={[es.chartDateText, { color: colors.textMuted }]}>{data[data.length - 1]?.date?.slice(5) ?? ''}</Text>
       </View>
     </View>
   )
@@ -47,10 +50,10 @@ function MiniChart({ data, colors }: { data: { date: string; amount: number }[];
 
 function StatCard({ label, value, sub, color, colors, s }: any) {
   return (
-    <View style={[s.card, { flex: 1, alignItems: 'center', paddingVertical: 16 }]}>
-      <Text style={{ color: color ?? '#FF6B35', fontSize: 22, fontWeight: '800' }}>{value}</Text>
-      <Text style={[s.textMuted, { fontSize: 12, marginTop: 4, textAlign: 'center' }]}>{label}</Text>
-      {sub && <Text style={{ color: colors.textMuted, fontSize: 11, marginTop: 2 }}>{sub}</Text>}
+    <View style={[s.card, es.statCardInner]}>
+      <Text style={[es.statValue, { color: color ?? '#FF6B35' }]}>{value}</Text>
+      <Text style={[es.statLabel, { color: colors.textMuted }]}>{label}</Text>
+      {sub && <Text style={[es.statSub, { color: colors.textMuted }]}>{sub}</Text>}
     </View>
   )
 }
@@ -60,29 +63,13 @@ function StatCard({ label, value, sub, color, colors, s }: any) {
 function TxRow({ item, colors, s }: any) {
   const isPositive = item.type !== 'refund'
   return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        gap: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: colors.border
-      }}>
-      <View
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: isPositive ? '#22C55E20' : '#EF444420',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-        <Text style={{ fontSize: 18 }}>{item.type === 'order' ? '✅' : item.type === 'bonus' ? '🎁' : '↩️'}</Text>
+    <View style={[es.txRow, { borderBottomColor: colors.border }]}>
+      <View style={[es.txIconWrap, { backgroundColor: isPositive ? '#22C55E20' : '#EF444420' }]}>
+        <Text style={es.txIconText}>{item.type === 'order' ? '✅' : item.type === 'bonus' ? '🎁' : '↩️'}</Text>
       </View>
-      <View style={{ flex: 1 }}>
-        <Text style={[s.textLabel, { fontSize: 14 }]}>{item.description ?? 'Заказ'}</Text>
-        <Text style={[s.textMuted, { fontSize: 12 }]}>
+      <View style={es.txInfo}>
+        <Text style={[es.txDesc, { color: colors.text }]}>{item.description ?? 'Заказ'}</Text>
+        <Text style={[es.txDate, { color: colors.textMuted }]}>
           {new Date(item.createdAt).toLocaleDateString('ru', {
             day: 'numeric',
             month: 'short',
@@ -91,17 +78,12 @@ function TxRow({ item, colors, s }: any) {
           })}
         </Text>
       </View>
-      <View style={{ alignItems: 'flex-end' }}>
-        <Text
-          style={{
-            fontWeight: '700',
-            fontSize: 15,
-            color: isPositive ? '#22C55E' : '#EF4444'
-          }}>
+      <View style={es.txAmountCol}>
+        <Text style={[es.txAmount, { color: isPositive ? '#22C55E' : '#EF4444' }]}>
           {isPositive ? '+' : '-'}
           {Number(item.net).toLocaleString()} ₸
         </Text>
-        <Text style={[s.textMuted, { fontSize: 11 }]}>комиссия {Number(item.commission).toLocaleString()} ₸</Text>
+        <Text style={[es.txCommission, { color: colors.textMuted }]}>комиссия {Number(item.commission).toLocaleString()} ₸</Text>
       </View>
     </View>
   )
@@ -134,8 +116,8 @@ export default function EarningsScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View style={{ paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-        <Text style={[s.textTitle, { fontSize: 24 }]}>Заработок</Text>
+      <View style={[es.header, { borderBottomColor: colors.border }]}>
+        <Text style={[es.title, { color: colors.text }]}>Заработок</Text>
       </View>
 
       {isLoading ? (
@@ -144,55 +126,30 @@ export default function EarningsScreen() {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{ padding: 20, gap: 16 }}>
+          <View style={{ padding: sm(20), gap: vs(16) }}>
             {/* Баланс */}
-            <Animated.View
-              entering={FadeInDown.delay(50).springify()}
-              style={[
-                s.card,
-                {
-                  // @ts-ignore
-                  background: 'linear-gradient(135deg, #FF6B35, #FF8C42)',
-                  backgroundColor: '#FF6B35',
-                  borderRadius: 20,
-                  padding: 24
-                }
-              ]}>
-              <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginBottom: 4 }}>Доступно к выводу</Text>
-              <Text style={{ color: '#fff', fontSize: 36, fontWeight: '800', marginBottom: 4 }}>{Number(bal?.available ?? 0).toLocaleString()} ₸</Text>
-              <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>Ожидает: {Number(bal?.pending ?? 0).toLocaleString()} ₸</Text>
-              <View style={{ flexDirection: 'row', gap: 8, marginTop: 16 }}>
-                <Pressable
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    borderRadius: 12,
-                    paddingVertical: 12,
-                    alignItems: 'center'
-                  }}>
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>💳 Вывести</Text>
+            <Animated.View entering={FadeInDown.delay(50).springify()} style={es.balanceCard}>
+              <Text style={es.balanceLabel}>Доступно к выводу</Text>
+              <Text style={es.balanceAmount}>{Number(bal?.available ?? 0).toLocaleString()} ₸</Text>
+              <Text style={es.balancePending}>Ожидает: {Number(bal?.pending ?? 0).toLocaleString()} ₸</Text>
+              <View style={es.balanceBtnRow}>
+                <Pressable style={es.balanceBtn}>
+                  <Text style={es.balanceBtnText}>💳 Вывести</Text>
                 </Pressable>
-                <Pressable
-                  style={{
-                    flex: 1,
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    borderRadius: 12,
-                    paddingVertical: 12,
-                    alignItems: 'center'
-                  }}>
-                  <Text style={{ color: '#fff', fontWeight: '600' }}>📊 История</Text>
+                <Pressable style={es.balanceBtn}>
+                  <Text style={es.balanceBtnText}>📊 История</Text>
                 </Pressable>
               </View>
             </Animated.View>
 
             {/* Быстрая статистика */}
-            <Animated.View entering={FadeInDown.delay(100).springify()} style={{ flexDirection: 'row', gap: 12 }}>
+            <Animated.View entering={FadeInDown.delay(100).springify()} style={es.quickRow}>
               <StatCard label="За месяц" colors={colors} s={s} color="#22C55E" value={`${Number(bal?.thisMonth ?? 0).toLocaleString()} ₸`} />
               <StatCard label="За неделю" colors={colors} s={s} color="#3B82F6" value={`${Number(bal?.thisWeek ?? 0).toLocaleString()} ₸`} />
             </Animated.View>
 
             {/* Метрики */}
-            <Animated.View entering={FadeInDown.delay(150).springify()} style={{ flexDirection: 'row', gap: 12 }}>
+            <Animated.View entering={FadeInDown.delay(150).springify()} style={es.metricsRow}>
               <StatCard label="Заказов" colors={colors} s={s} value={st?.completedOrders ?? 0} sub="выполнено" />
               <StatCard label="Рейтинг" colors={colors} s={s} color="#F59E0B" value={`★ ${Number(st?.rating ?? 0).toFixed(1)}`} sub={`${st?.reviewCount ?? 0} отзывов`} />
               <StatCard label="Комиссия" colors={colors} s={s} color="#8B5CF6" value={`${(COMMISSION * 100).toFixed(0)}%`} sub="платформы" />
@@ -201,7 +158,7 @@ export default function EarningsScreen() {
             {/* График */}
             {stats?.chart?.length > 0 && (
               <Animated.View entering={FadeInDown.delay(200).springify()} style={s.card}>
-                <Text style={[s.textLabel, { marginBottom: 16 }]}>Заработок за 30 дней</Text>
+                <Text style={[s.textLabel, { marginBottom: vs(16) }]}>Заработок за 30 дней</Text>
                 <MiniChart data={stats.chart} colors={colors} />
               </Animated.View>
             )}
@@ -209,21 +166,21 @@ export default function EarningsScreen() {
             {/* Прогноз */}
             {forecast && (
               <Animated.View entering={FadeInDown.delay(250).springify()} style={s.card}>
-                <Text style={[s.textLabel, { marginBottom: 12 }]}>📈 Прогноз</Text>
-                <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-                  <View style={[s.elevated, { flex: 1, borderRadius: 12, padding: 12, alignItems: 'center' }]}>
-                    <Text style={{ color: '#FF6B35', fontWeight: '700', fontSize: 16 }}>{Number(forecast.monthlyAvg).toLocaleString()} ₸</Text>
-                    <Text style={[s.textMuted, { fontSize: 11 }]}>в месяц</Text>
+                <Text style={[s.textLabel, { marginBottom: vs(12) }]}>📈 Прогноз</Text>
+                <View style={es.forecastRow}>
+                  <View style={[s.elevated, es.forecastItem]}>
+                    <Text style={[es.forecastAmount, { color: '#FF6B35' }]}>{Number(forecast.monthlyAvg).toLocaleString()} ₸</Text>
+                    <Text style={[es.forecastPeriod, { color: colors.textMuted }]}>в месяц</Text>
                   </View>
-                  <View style={[s.elevated, { flex: 1, borderRadius: 12, padding: 12, alignItems: 'center' }]}>
-                    <Text style={{ color: '#22C55E', fontWeight: '700', fontSize: 16 }}>{Number(forecast.yearlyForecast).toLocaleString()} ₸</Text>
-                    <Text style={[s.textMuted, { fontSize: 11 }]}>в год</Text>
+                  <View style={[s.elevated, es.forecastItem]}>
+                    <Text style={[es.forecastAmount, { color: '#22C55E' }]}>{Number(forecast.yearlyForecast).toLocaleString()} ₸</Text>
+                    <Text style={[es.forecastPeriod, { color: colors.textMuted }]}>в год</Text>
                   </View>
                 </View>
                 {forecast.tips?.map((tip: string, i: number) => (
-                  <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 6 }}>
-                    <Text style={{ color: '#FF6B35' }}>💡</Text>
-                    <Text style={[s.textSecondary, { flex: 1, fontSize: 13 }]}>{tip}</Text>
+                  <View key={i} style={es.tipRow}>
+                    <Text style={{ color: '#FF6B35', fontSize: sm(14) }}>💡</Text>
+                    <Text style={[es.tipText, { color: colors.textSecondary }]}>{tip}</Text>
                   </View>
                 ))}
               </Animated.View>
@@ -231,12 +188,12 @@ export default function EarningsScreen() {
 
             {/* История транзакций */}
             <Animated.View entering={FadeInDown.delay(300).springify()}>
-              <Text style={[s.textTitle, { fontSize: 18, marginBottom: 12 }]}>История транзакций</Text>
+              <Text style={[es.sectionTitle, { color: colors.text }]}>История транзакций</Text>
               {stats?.history?.length === 0 ? (
-                <View style={[s.card, { alignItems: 'center', paddingVertical: 32 }]}>
-                  <Text style={{ fontSize: 36, marginBottom: 8 }}>💸</Text>
-                  <Text style={s.textLabel}>Пока нет транзакций</Text>
-                  <Text style={[s.textMuted, { textAlign: 'center', marginTop: 4 }]}>Выполните первый заказ чтобы увидеть заработок</Text>
+                <View style={[s.card, es.emptyCard]}>
+                  <Text style={es.emptyIcon}>💸</Text>
+                  <Text style={[s.textLabel, { color: colors.text }]}>Пока нет транзакций</Text>
+                  <Text style={[s.textMuted, es.emptyText, { color: colors.textMuted }]}>Выполните первый заказ чтобы увидеть заработок</Text>
                 </View>
               ) : (
                 <View style={s.card}>
