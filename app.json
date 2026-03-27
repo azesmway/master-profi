@@ -45,7 +45,16 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./public/icons/icon-96.png"
+      "favicon": "./public/icons/icon-96.png",
+      "display": "standalone",
+      "themeColor": "#0F0F0F",
+      "backgroundColor": "#0F0F0F",
+      "meta": {
+        "apple-mobile-web-app-capable": "yes",
+        "apple-mobile-web-app-status-bar-style": "black-translucent",
+        "apple-mobile-web-app-title": "Мастер",
+        "mobile-web-app-capable": "yes"
+      }
     },
     "plugins": [
       [

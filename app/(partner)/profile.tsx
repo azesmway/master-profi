@@ -21,7 +21,6 @@ export default function PartnerProfileScreen() {
   const queryClient = useQueryClient()
   const s = makeStyles(colors)
   const user = useAuthStore(state => state.user)
-  const logout = useAuthStore(state => state.logout)
   const setUser = useAuthStore(state => state.setUser)
 
   const [name, setName] = useState(user?.name ?? '')

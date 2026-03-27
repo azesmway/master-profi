@@ -1,2 +1,3 @@
-import ChatsListScreen from '@/components/shared/ChatsList';
-export default ChatsListScreen;
+import ChatsListScreen from '@/components/shared/ChatsList'
+
+export default ChatsListScreen

@@ -1,83 +1,148 @@
-import { View, Text, Pressable } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+
+import { useTheme } from '@/hooks/useTheme'
+
+// ─── EmptyState ───────────────────────────────────────────────────────────────
 
 interface EmptyStateProps {
-  icon:        string;
-  title:       string;
-  description: string;
-  actionLabel?: string;
-  onAction?:   () => void;
+  icon: string
+  title: string
+  description: string
+  actionLabel?: string
+  onAction?: () => void
 }
 
 export function EmptyState({ icon, title, description, actionLabel, onAction }: EmptyStateProps) {
+  const { colors } = useTheme()
   return (
-    <View className="flex-1 items-center justify-center py-16 px-8">
-      <Text className="text-5xl mb-4">{icon}</Text>
-      <Text className="text-dark dark:text-white text-lg font-semibold mb-2 text-center">{title}</Text>
-      <Text className="text-text-muted dark:text-text-secondary text-sm text-center leading-5">{description}</Text>
+    <View style={styles.center}>
+      <Text style={styles.icon}>{icon}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+      <Text style={[styles.desc, { color: colors.textSecondary }]}>{description}</Text>
       {actionLabel && onAction && (
-        <Pressable
-          onPress={onAction}
-          className="mt-6 bg-primary px-6 py-3 rounded-xl active:opacity-80"
-        >
-          <Text className="text-dark dark:text-white font-semibold">{actionLabel}</Text>
+        <Pressable onPress={onAction} style={[styles.actionBtn, { backgroundColor: '#FF6B35' }]}>
+          <Text style={styles.actionLabel}>{actionLabel}</Text>
         </Pressable>
       )}
     </View>
-  );
+  )
 }
 
+// ─── ErrorView ────────────────────────────────────────────────────────────────
+
 interface ErrorViewProps {
-  message?: string;
-  onRetry?: () => void;
+  message?: string
+  onRetry?: () => void
 }
 
 export function ErrorView({ message = 'Что-то пошло не так', onRetry }: ErrorViewProps) {
+  const { colors } = useTheme()
   return (
-    <View className="flex-1 items-center justify-center py-16 px-8">
-      <Text className="text-5xl mb-4">⚠️</Text>
-      <Text className="text-dark dark:text-white text-lg font-semibold mb-2 text-center">Ошибка</Text>
-      <Text className="text-text-muted dark:text-text-secondary text-sm text-center leading-5">{message}</Text>
+    <View style={styles.center}>
+      <Text style={styles.icon}>⚠️</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Ошибка</Text>
+      <Text style={[styles.desc, { color: colors.textSecondary }]}>{message}</Text>
       {onRetry && (
-        <Pressable
-          onPress={onRetry}
-          className="mt-6 border border-light-border dark:border-dark-border px-6 py-3 rounded-xl active:opacity-80"
-        >
-          <Text className="text-dark dark:text-white font-medium">Попробовать снова</Text>
+        <Pressable onPress={onRetry} style={[styles.actionBtn, { borderWidth: 1, borderColor: colors.border, backgroundColor: 'transparent' }]}>
+          <Text style={{ color: colors.text, fontWeight: '500' }}>Попробовать снова</Text>
         </Pressable>
       )}
     </View>
-  );
+  )
 }
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 interface SkeletonProps {
-  width?:  string;
-  height?: number;
-  rounded?: string;
+  width?: number | string
+  height?: number
+  borderRadius?: number
 }
 
-export function Skeleton({ width = 'w-full', height = 16, rounded = 'rounded-lg' }: SkeletonProps) {
-  return (
-    <View className={`bg-light-elevated dark:bg-dark-elevated ${width} ${rounded}`} style={{ height }} />
-  );
+export function Skeleton({ width = '100%', height = 16, borderRadius = 8 }: SkeletonProps) {
+  const { colors } = useTheme()
+  return <View style={{ width: width as any, height, borderRadius, backgroundColor: colors.elevated }} />
 }
 
 export function SpecialistCardSkeleton() {
+  const { colors } = useTheme()
   return (
-    <View className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl p-4 gap-3">
-      <View className="flex-row gap-3">
-        <View className="w-14 h-14 rounded-xl bg-light-elevated dark:bg-dark-elevated" />
-        <View className="flex-1 gap-2">
-          <Skeleton width="w-32" height={14} />
-          <Skeleton width="w-20" height={11} />
-          <Skeleton width="w-40" height={11} />
+    <View style={[skeletonStyles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={skeletonStyles.row}>
+        <View style={[skeletonStyles.avatar, { backgroundColor: colors.elevated }]} />
+        <View style={skeletonStyles.info}>
+          <Skeleton width={128} height={14} />
+          <Skeleton width={80} height={11} />
+          <Skeleton width={160} height={11} />
         </View>
-        <View className="gap-1 items-end">
-          <Skeleton width="w-16" height={14} />
-          <Skeleton width="w-10" height={11} />
+        <View style={skeletonStyles.priceCol}>
+          <Skeleton width={64} height={14} />
+          <Skeleton width={40} height={11} />
         </View>
       </View>
-      <Skeleton width="w-full" height={12} />
-      <Skeleton width="w-3/4"  height={12} />
+      <Skeleton height={12} />
+      <Skeleton width="75%" height={12} />
     </View>
-  );
+  )
 }
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 64,
+    paddingHorizontal: 32
+  },
+  icon: {
+    fontSize: 48,
+    marginBottom: 16
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center'
+  },
+  desc: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20
+  },
+  actionBtn: {
+    marginTop: 24,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12
+  },
+  actionLabel: {
+    color: '#fff',
+    fontWeight: '600'
+  }
+})
+
+const skeletonStyles = StyleSheet.create({
+  card: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 16,
+    gap: 12
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 12
+  },
+  info: {
+    flex: 1,
+    gap: 8
+  },
+  priceCol: {
+    gap: 4,
+    alignItems: 'flex-end'
+  }
+})

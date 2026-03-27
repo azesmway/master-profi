@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { useRouter } from 'expo-router'
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -88,7 +88,7 @@ export default function SpecialistOrdersScreen() {
   const filtered = data ?? []
 
   const sorted = filtered.sort((a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
-    if (!location) return 0
+    if (!location.lat || !location.lng) return 0
     const dA = getDistance(location.lat, location.lng, a.lat, a.lng)
     const dB = getDistance(location.lat, location.lng, b.lat, b.lng)
     return dA - dB

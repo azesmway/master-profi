@@ -1,0 +1,171 @@
+diff --git a/node_modules/react-native-size-matters/index.d.ts b/node_modules/react-native-size-matters/index.d.ts
+index fcb20fc..bcc8332 100644
+--- a/node_modules/react-native-size-matters/index.d.ts
++++ b/node_modules/react-native-size-matters/index.d.ts
+@@ -1,6 +1,32 @@
+ import * as RN from 'react-native';
+
+ declare module 'react-native-size-matters' {
++    interface StringifiedStyles {
++        fontSize?: string | number;
++        letterSpacing?: string | number;
++        lineHeight?: string | number;
++        textShadowRadius?: string | number;
++        textShadowOffset?: { width: number | string; height: number | string; };
++        shadowOffset?: { width: number | string; height: number | string; };
++        borderBottomLeftRadius?: string | number;
++        borderBottomRightRadius?: string | number;
++        borderTopLeftRadius?: string | number;
++        borderTopRightRadius?: string | number;
++        borderBottomWidth?: string | number;
++        borderTopWidth?: string | number;
++        borderRightWidth?: string | number;
++        borderLeftWidth?: string | number;
++        borderRadius?: string | number;
++        shadowRadius?: string | number;
++        borderWidth?: string | number;
++        aspectRatio?: string | number;
++        rotation?: string | number;
++        scaleX?: string | number;
++        scaleY?: string | number;
++        translateX?: string | number;
++        translateY?: string | number;
++    }
++
+     export function scale(size: number): number;
+     export function verticalScale(size: number): number;
+     export function moderateScale(size: number, factor?: number): number;
+@@ -19,7 +45,7 @@ declare module 'react-native-size-matters' {
+     type ViewStyle = WithSize<RN.ViewStyle>;
+     type TextStyle = WithSize<RN.TextStyle>;
+     type ImageStyle = WithSize<RN.ImageStyle>;
+-    type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
++    type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle | StringifiedStyles };
+
+     export namespace ScaledSheet {
+         export function create<T extends NamedStyles<T> | NamedStyles<any>>(
+diff --git a/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js b/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
+index f8edcb9..f3ae0ef 100644
+--- a/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
++++ b/node_modules/react-native-size-matters/lib/extend/scaling-utils.extend.js
+@@ -1,16 +1,52 @@
+-import { Dimensions } from 'react-native';
+-import { SIZE_MATTERS_BASE_WIDTH, SIZE_MATTERS_BASE_HEIGHT } from '@env';
++import {Dimensions, PixelRatio, Platform} from 'react-native';
++import { isMobile } from "react-device-detect";
++
++const SIZE_MATTERS_BASE_WIDTH = 387
++const SIZE_MATTERS_BASE_HEIGHT = 849
+
+ const { width, height } = Dimensions.get('window');
+ const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
+
+ //Default guideline sizes are based on standard ~5" screen mobile device
+-const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 350;
+-const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 680;
++const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 387;
++const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 849;
++
++export const scale = size => {
++  if (!isMobile) return size
++
++  const { width, height } = Dimensions.get('window');
++  const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
++
++//Default guideline sizes are based on standard ~5" screen mobile device
++  const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 387;
++  const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 849;
++
++  return shortDimension / guidelineBaseWidth * size;
++}
++export const verticalScale = size => {
++  if (!isMobile) return size
++
++  const { width, height } = Dimensions.get('window');
++  const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
++
++//Default guideline sizes are based on standard ~5" screen mobile device
++  const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 387;
++  const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 849;
++
++  return longDimension / guidelineBaseHeight * size;
++}
++export const moderateScale = (size, factor = 0.5) => {
++  if (!isMobile) return size
++
++  const { width, height } = Dimensions.get('window');
++  const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
++
++//Default guideline sizes are based on standard ~5" screen mobile device
++  const guidelineBaseWidth = SIZE_MATTERS_BASE_WIDTH || 387;
++  const guidelineBaseHeight = SIZE_MATTERS_BASE_HEIGHT || 849;
+
+-export const scale = size => shortDimension / guidelineBaseWidth * size;
+-export const verticalScale = size => longDimension / guidelineBaseHeight * size;
+-export const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
++  return size + (scale(size) - size) * factor;
++}
+ export const moderateVerticalScale = (size, factor = 0.5) => size + (verticalScale(size) - size) * factor;
+
+ export const s = scale;
+diff --git a/node_modules/react-native-size-matters/lib/scaling-utils.js b/node_modules/react-native-size-matters/lib/scaling-utils.js
+index e89372a..3d34921 100644
+--- a/node_modules/react-native-size-matters/lib/scaling-utils.js
++++ b/node_modules/react-native-size-matters/lib/scaling-utils.js
+@@ -1,15 +1,49 @@
+-import { Dimensions } from 'react-native';
++import { Dimensions, PixelRatio, Platform } from 'react-native';
++import { isMobile } from "react-device-detect";
+
+-const { width, height } = Dimensions.get('window');
++const { width, height } = Dimensions.get('screen');
+ const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
+
+ //Default guideline sizes are based on standard ~5" screen mobile device
+-const guidelineBaseWidth = 350;
+-const guidelineBaseHeight = 680;
++const guidelineBaseWidth = 387;
++const guidelineBaseHeight = 849;
+
+-export const scale = size => shortDimension / guidelineBaseWidth * size;
+-export const verticalScale = size => longDimension / guidelineBaseHeight * size;
+-export const moderateScale = (size, factor = 0.5) => size + (scale(size) - size) * factor;
++// export const scale = size => {
++//   const { width: SCREEN_WIDTH } = Dimensions.get('screen');
++//   const scaleWidth = SCREEN_WIDTH / (Platform.OS === 'android' ? 387 : 387);
++//
++//   return PixelRatio.roundToNearestPixel(size * scaleWidth);
++// }
++
++export const scale = size => {
++  if (!isMobile) return size
++
++  const { width, height } = Dimensions.get('screen');
++  const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
++
++  return shortDimension / guidelineBaseWidth * size;
++}
++
++// export const verticalScale = size => {
++//   const { height: SCREEN_HEIGHT } = Dimensions.get('screen');
++//   const scaleHeight = SCREEN_HEIGHT / (Platform.OS === 'android' ? 849 : 849);
++//
++//   return PixelRatio.roundToNearestPixel(size * scaleHeight);
++// }
++
++export const verticalScale = size => {
++  if (!isMobile) return size
++
++  const { width, height } = Dimensions.get('screen');
++  const [shortDimension, longDimension] = width < height ? [width, height] : [height, width];
++
++  return longDimension / guidelineBaseHeight * size;
++}
++export const moderateScale = (size, factor = 0.5) => {
++  if (!isMobile) return size
++
++  return size + (scale(size) - size) * factor;
++}
+ export const moderateVerticalScale = (size, factor = 0.5) => size + (verticalScale(size) - size) * factor;
+
+ export const s = scale;

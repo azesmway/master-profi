@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useRouter } from 'expo-router'
 import { useEffect, useRef, useState } from 'react'
-import { Dimensions, FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
-import Animated, { FadeIn, FadeInDown, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
+import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { analytics } from '@/services/analytics'

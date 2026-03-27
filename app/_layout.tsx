@@ -1,19 +1,11 @@
-if (__DEV__) {
-  require('@/config/reactotron')
-}
-
-import '../global.css'
-
 import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold, useFonts } from '@expo-google-fonts/manrope'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useQueryClient } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect, useState } from 'react'
-import { Platform, View } from 'react-native'
-import { useColorScheme } from 'react-native'
+import { Platform, useColorScheme, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { PWABanner } from '@/components/pwa/PWABanner'
@@ -50,7 +42,6 @@ function GlobalSocketListener() {
 
   useSocket({
     onMessage: () => {
-      // Обновляем список чатов при любом новом сообщении
       queryGlobalClient.invalidateQueries({ queryKey: [QUERY_KEYS.CHAT_ROOMS] })
     }
   })
@@ -97,7 +88,6 @@ function AuthGuard() {
           case 'admin':
             router.replace('/(admin)/dashboard')
             break
-          // @ts-ignore
           case 'partner':
             // @ts-ignore
             router.replace('/(partner)/orders')
@@ -134,31 +124,26 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (!accessToken || Platform.OS !== 'web') return
-
     navigator.serviceWorker.ready.then(reg => {
       reg.pushManager.getSubscription().then(sub => {
         if (!sub) return
         fetch(`${API_BASE_URL}/notifications/web-push-token`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`
-          },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
           body: JSON.stringify({ subscription: sub.toJSON() })
         })
           .then(() => console.log('[PWA] push token synced'))
           .catch(e => console.warn('[PWA] push sync error:', e))
       })
     })
-  }, [accessToken]) // срабатывает когда токен появился (после логина)
+  }, [accessToken])
 
   if (!fontsLoaded && !fontError) return null
 
   return (
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {/* View с className — NativeWind применяет dark: классы через этот элемент */}
-        <View style={{ flex: 1, backgroundColor: isDark ? '#0F0F0F' : '#FFFFFF' }} className={isDark ? 'flex-1 dark' : 'flex-1'}>
+        <View style={{ flex: 1, backgroundColor: isDark ? '#0F0F0F' : '#FFFFFF' }}>
           <StatusBar style={isDark ? 'light' : 'dark'} translucent />
           <AuthGuard />
           <GlobalSocketListener />

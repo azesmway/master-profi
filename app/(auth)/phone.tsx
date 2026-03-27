@@ -3,14 +3,13 @@ import { useTheme } from '@hooks/useTheme'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter } from 'expo-router'
 import { useRef, useState } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import { getApiError } from '@/services/api'
 import { authService } from '@/services/authService'
 
 const COUNTRY_CODES = [
-  { code: '+7', flag: '🇰🇿', name: 'KZ' },
   { code: '+7', flag: '🇷🇺', name: 'RU' },
   { code: '+996', flag: '🇰🇬', name: 'KG' }
 ] as const
@@ -31,10 +30,7 @@ export default function PhoneScreen() {
   const mutation = useMutation({
     mutationFn: () => authService.sendOtp({ phone: `${country.code}${phone}` }),
     onSuccess: () => {
-      router.push({
-        pathname: '/(auth)/otp',
-        params: { phone: `${country.code}${phone}` }
-      })
+      router.push({ pathname: '/(auth)/otp', params: { phone: `${country.code}${phone}` } })
     },
     onError: err => setError(getApiError(err))
   })
@@ -51,28 +47,24 @@ export default function PhoneScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        {/* Header */}
-        <View className="px-6 pt-16 pb-4">
-          <Pressable onPress={() => router.back()} className="mb-8">
-            <Text className="text-primary text-base">← Назад</Text>
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backBtn}>
+            <Text style={styles.backText}>← Назад</Text>
           </Pressable>
 
           <Animated.View entering={FadeInDown.delay(100).springify()}>
-            <Text className="text-dark dark:text-white text-3xl font-bold mb-2">Ваш номер телефона</Text>
-            <Text className="text-text-muted dark:text-text-secondary text-base">Отправим код подтверждения по SMS</Text>
+            <Text style={[styles.title, { color: colors.text }]}>Ваш номер телефона</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Отправим код подтверждения по SMS</Text>
           </Animated.View>
         </View>
 
-        {/* Input */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} className="px-6 mt-4">
-          <View className="flex-row items-center bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl overflow-hidden">
-            {/* Country picker */}
-            <Pressable onPress={() => setCountryIdx(i => (i + 1) % COUNTRY_CODES.length)} className="flex-row items-center gap-2 px-4 py-5 border-r border-light-border dark:border-dark-border">
-              <Text className="text-xl">{country.flag}</Text>
-              <Text className="text-dark dark:text-white font-medium">{country.code}</Text>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.inputArea}>
+          <View style={[styles.phoneRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Pressable onPress={() => setCountryIdx(i => (i + 1) % COUNTRY_CODES.length)} style={[styles.countryPicker, { borderRightColor: colors.border }]}>
+              <Text style={styles.flag}>{country.flag}</Text>
+              <Text style={[styles.code, { color: colors.text }]}>{country.code}</Text>
             </Pressable>
 
-            {/* Phone input */}
             <TextInput
               ref={inputRef}
               value={phone}
@@ -82,24 +74,70 @@ export default function PhoneScreen() {
               }}
               keyboardType="phone-pad"
               placeholder="700 000 0000"
-              placeholderTextColor="#555"
-              style={{ color: colors.text }}
+              placeholderTextColor={colors.textMuted}
+              // @ts-ignore
+              style={[styles.phoneInput, { color: colors.text, outlineStyle: 'none' }]}
               autoFocus
               returnKeyType="done"
               onSubmitEditing={handleSubmit}
             />
           </View>
 
-          {error ? <Text className="text-error text-sm mt-2 ml-1">{error}</Text> : null}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
         </Animated.View>
 
-        {/* Submit */}
-        <Animated.View entering={FadeInDown.delay(300).springify()} className="px-6 mt-6">
-          <Pressable onPress={handleSubmit} disabled={mutation.isPending || phone.length < 10} className="bg-primary py-4 rounded-2xl items-center active:opacity-80 disabled:opacity-40">
-            {mutation.isPending ? <ActivityIndicator color="white" /> : <Text className="text-dark dark:text-white text-base font-bold">Получить код</Text>}
+        <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.submitArea}>
+          <Pressable
+            onPress={handleSubmit}
+            disabled={mutation.isPending || phone.length < 10}
+            style={({ pressed }) => [styles.submitBtn, (mutation.isPending || phone.length < 10) && styles.disabledBtn, pressed && styles.pressed]}>
+            {mutation.isPending ? <ActivityIndicator color="white" /> : <Text style={styles.submitText}>Получить код</Text>}
           </Pressable>
         </Animated.View>
       </KeyboardAvoidingView>
     </Screen>
   )
 }
+
+const styles = StyleSheet.create({
+  header: { paddingHorizontal: 24, paddingTop: 64, paddingBottom: 16 },
+  backBtn: { marginBottom: 32 },
+  backText: { color: '#FF6B35', fontSize: 16 },
+  title: { fontSize: 28, fontWeight: '700', marginBottom: 8 },
+  subtitle: { fontSize: 16 },
+  inputArea: { paddingHorizontal: 24, marginTop: 16 },
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: 'hidden'
+  },
+  countryPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    borderRightWidth: 1
+  },
+  flag: { fontSize: 20 },
+  code: { fontWeight: '600', fontSize: 16 },
+  phoneInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    fontSize: 16
+  },
+  errorText: { color: '#EF4444', fontSize: 14, marginTop: 8, marginLeft: 4 },
+  submitArea: { paddingHorizontal: 24, marginTop: 24 },
+  submitBtn: {
+    backgroundColor: '#FF6B35',
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center'
+  },
+  disabledBtn: { opacity: 0.4 },
+  pressed: { opacity: 0.8 },
+  submitText: { color: '#fff', fontSize: 16, fontWeight: '700' }
+})

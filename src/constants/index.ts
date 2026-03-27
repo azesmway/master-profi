@@ -3,8 +3,8 @@
 export const APP_NAME = 'Мастер'
 export const APP_VERSION = '1.0.0'
 
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://api.master.kz/v1'
-export const WS_URL = process.env.EXPO_PUBLIC_WS_URL ?? 'wss://api.master.kz'
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'https://demo.it-trend.dev/v1'
+export const WS_URL = process.env.EXPO_PUBLIC_WS_URL ?? 'wss://demo.it-trend.dev'
 
 // ─── Design Tokens ──────────────────────────────────────────────────────────
 

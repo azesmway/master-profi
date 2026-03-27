@@ -1,5 +1,3 @@
-import type { ApiResponse } from '@/types'
-
 import { api } from './api'
 
 export interface CreateOrderPayload {

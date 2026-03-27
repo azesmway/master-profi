@@ -1,8 +1,8 @@
 import { useTheme } from '@hooks/useTheme'
 import { useMutation } from '@tanstack/react-query'
-import {useLocalSearchParams, useRouter} from 'expo-router'
+import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 
 import Screen from '@/components/ui/Screen'
@@ -13,24 +13,9 @@ import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types'
 
 const ROLES: Array<{ role: UserRole; title: string; desc: string; icon: string }> = [
-  {
-    role: 'client',
-    title: 'Ищу специалиста',
-    desc: 'Создаю заказы, нахожу мастеров',
-    icon: '🔍'
-  },
-  {
-    role: 'specialist',
-    title: 'Я специалист',
-    desc: 'Принимаю заказы, предлагаю услуги',
-    icon: '🛠️'
-  },
-  {
-    role: 'partner',
-    title: 'Я партнёр',
-    desc: 'Привожу клиентов, получаю комиссию',
-    icon: '🤝'
-  }
+  { role: 'client', title: 'Ищу специалиста', desc: 'Создаю заказы, нахожу мастеров', icon: '🔍' },
+  { role: 'specialist', title: 'Я специалист', desc: 'Принимаю заказы, предлагаю услуги', icon: '🛠️' },
+  { role: 'partner', title: 'Я партнёр', desc: 'Привожу клиентов, получаю комиссию', icon: '🤝' }
 ]
 
 export default function RegisterScreen() {
@@ -72,16 +57,16 @@ export default function RegisterScreen() {
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <View className="px-6 pt-16">
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+          <View style={styles.container}>
             <Animated.View entering={FadeInDown.delay(100).springify()}>
-              <Text className="text-dark dark:text-white text-3xl font-bold mb-2">Создаём аккаунт</Text>
-              <Text className="text-text-muted dark:text-text-secondary text-base mb-8">Пару шагов — и вы в деле</Text>
+              <Text style={[styles.title, { color: colors.text }]}>Создаём аккаунт</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Пару шагов — и вы в деле</Text>
             </Animated.View>
 
             {/* Name */}
-            <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-6">
-              <Text className="text-text-muted dark:text-text-secondary text-sm font-medium mb-2 ml-1">Ваше имя</Text>
+            <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.section}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Ваше имя</Text>
               <TextInput
                 value={name}
                 onChangeText={t => {
@@ -89,71 +74,66 @@ export default function RegisterScreen() {
                   setError('')
                 }}
                 placeholder="Ваше ФИО"
-                placeholderTextColor="#c0c0c0"
+                placeholderTextColor={colors.textMuted}
                 autoCapitalize="words"
                 returnKeyType="done"
-                className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 py-5 text-white text-base"
-                style={{ color: colors.text }}
                 autoFocus
+                style={[styles.input, { backgroundColor: colors.card, borderColor: colors.border, color: colors.text }]}
               />
             </Animated.View>
 
             {/* Role */}
-            <Animated.View entering={FadeInDown.delay(300).springify()} className="mb-6">
-              <Text className="text-text-muted dark:text-text-secondary text-sm font-medium mb-2 ml-1">Кто вы?</Text>
-              <View className="gap-3">
+            <Animated.View entering={FadeInDown.delay(300).springify()} style={styles.section}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Кто вы?</Text>
+              <View style={styles.roleList}>
                 {ROLES.map(r => (
                   <Pressable
                     key={r.role}
                     onPress={() => setRole(r.role)}
-                    className={[
-                      'flex-row items-center gap-4 p-4 rounded-2xl border',
-                      role === r.role ? 'bg-primary/10 border-primary' : 'bg-light-card dark:bg-dark-card border-light-border dark:border-dark-border'
-                    ].join(' ')}>
-                    <Text className="text-3xl">{r.icon}</Text>
-                    <View className="flex-1">
-                      <Text style={{ color: colors.text }}>{r.title}</Text>
-                      <Text className="text-text-muted dark:text-text-secondary text-sm mt-0.5">{r.desc}</Text>
+                    style={[styles.roleItem, { backgroundColor: colors.card, borderColor: colors.border }, role === r.role && styles.roleItemActive]}>
+                    <Text style={styles.roleIcon}>{r.icon}</Text>
+                    <View style={styles.roleText}>
+                      <Text style={[styles.roleTitle, { color: colors.text }]}>{r.title}</Text>
+                      <Text style={[styles.roleDesc, { color: colors.textSecondary }]}>{r.desc}</Text>
                     </View>
-                    <View className={['w-5 h-5 rounded-full border-2', role === r.role ? 'border-primary bg-primary' : 'border-light-border dark:border-dark-border'].join(' ')} />
+                    <View style={[styles.radioOuter, { borderColor: colors.border }, role === r.role && styles.radioOuterActive]}>{role === r.role && <View style={styles.radioInner} />}</View>
                   </Pressable>
                 ))}
               </View>
             </Animated.View>
 
             {/* City */}
-            <Animated.View entering={FadeInDown.delay(400).springify()} className="mb-8">
-              <Text className="text-text-muted dark:text-text-secondary text-sm font-medium mb-2 ml-1">Ваш город</Text>
-              <Pressable
-                onPress={() => setCityOpen(!cityOpen)}
-                className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 py-5 flex-row justify-between items-center">
-                <Text className="text-dark dark:text-white text-base">{city}</Text>
-                <Text className="text-text-muted dark:text-text-secondary">{cityOpen ? '▲' : '▼'}</Text>
+            <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.section}>
+              <Text style={[styles.label, { color: colors.textSecondary }]}>Ваш город</Text>
+              <Pressable onPress={() => setCityOpen(!cityOpen)} style={[styles.cityPicker, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Text style={[styles.cityText, { color: colors.text }]}>{city}</Text>
+                <Text style={{ color: colors.textMuted }}>{cityOpen ? '▲' : '▼'}</Text>
               </Pressable>
 
               {cityOpen && (
-                <View className="bg-light-elevated dark:bg-dark-elevated border border-light-border dark:border-dark-border rounded-2xl mt-2 overflow-hidden">
+                <View style={[styles.cityDropdown, { backgroundColor: colors.elevated, borderColor: colors.border }]}>
                   {KZ_CITIES.map(c => (
-                    <TouchableOpacity
+                    <Pressable
                       key={c}
                       onPress={() => {
                         setCity(c)
                         setCityOpen(false)
                       }}
-                      className={['px-4 py-3.5 border-b border-light-border dark:border-dark-border active:bg-dark-border', c === city ? 'bg-primary/10' : ''].join(' ')}>
-                      <Text className={c === city ? 'text-primary font-medium' : 'text-white'} style={{ color: colors.text }}>
-                        {c}
-                      </Text>
-                    </TouchableOpacity>
+                      style={({ pressed }) => [styles.cityOption, { borderBottomColor: colors.border }, c === city && styles.cityOptionActive, pressed && { backgroundColor: colors.elevated }]}>
+                      <Text style={[styles.cityOptionText, { color: c === city ? '#FF6B35' : colors.text }]}>{c}</Text>
+                    </Pressable>
                   ))}
                 </View>
               )}
             </Animated.View>
 
-            {error ? <Text className="text-error text-sm mb-4 ml-1">{error}</Text> : null}
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-            <Pressable onPress={handleSubmit} disabled={mutation.isPending || name.trim().length < 2} className="bg-primary py-4 rounded-2xl items-center active:opacity-80 disabled:opacity-40">
-              {mutation.isPending ? <ActivityIndicator color="white" /> : <Text className="text-dark dark:text-white text-base font-bold">Зарегистрироваться</Text>}
+            <Pressable
+              onPress={handleSubmit}
+              disabled={mutation.isPending || name.trim().length < 2}
+              style={({ pressed }) => [styles.submitBtn, (mutation.isPending || name.trim().length < 2) && styles.disabledBtn, pressed && styles.pressed]}>
+              {mutation.isPending ? <ActivityIndicator color="white" /> : <Text style={styles.submitText}>Зарегистрироваться</Text>}
             </Pressable>
           </View>
         </ScrollView>
@@ -161,3 +141,83 @@ export default function RegisterScreen() {
     </Screen>
   )
 }
+
+const styles = StyleSheet.create({
+  container: { paddingHorizontal: 24, paddingTop: 64 },
+  title: { fontSize: 28, fontWeight: '700', marginBottom: 8 },
+  subtitle: { fontSize: 16, marginBottom: 32 },
+  section: { marginBottom: 24 },
+  label: { fontSize: 13, fontWeight: '500', marginBottom: 8, marginLeft: 4 },
+  input: {
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    fontSize: 16
+  },
+  roleList: { gap: 12 },
+  roleItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1
+  },
+  roleItemActive: {
+    backgroundColor: 'rgba(255,107,53,0.08)',
+    borderColor: '#FF6B35'
+  },
+  roleIcon: { fontSize: 28 },
+  roleText: { flex: 1 },
+  roleTitle: { fontSize: 15, fontWeight: '600' },
+  roleDesc: { fontSize: 13, marginTop: 2 },
+  radioOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  radioOuterActive: { borderColor: '#FF6B35' },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#FF6B35'
+  },
+  cityPicker: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 20
+  },
+  cityText: { fontSize: 16 },
+  cityDropdown: {
+    borderWidth: 1,
+    borderRadius: 16,
+    marginTop: 8,
+    overflow: 'hidden'
+  },
+  cityOption: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderBottomWidth: 1
+  },
+  cityOptionActive: { backgroundColor: 'rgba(255,107,53,0.08)' },
+  cityOptionText: { fontSize: 15 },
+  errorText: { color: '#EF4444', fontSize: 14, marginBottom: 16, marginLeft: 4 },
+  submitBtn: {
+    backgroundColor: '#FF6B35',
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center'
+  },
+  disabledBtn: { opacity: 0.4 },
+  pressed: { opacity: 0.8 },
+  submitText: { color: '#fff', fontSize: 16, fontWeight: '700' }
+})

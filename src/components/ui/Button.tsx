@@ -1,67 +1,80 @@
-import { Pressable, Text, ActivityIndicator, type PressableProps } from 'react-native';
+import { ActivityIndicator, Pressable, type PressableProps, StyleSheet, Text } from 'react-native'
 
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-type Size    = 'sm' | 'md' | 'lg';
+import { useTheme } from '@/hooks/useTheme'
+
+type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
+type Size = 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends PressableProps {
-  label:     string;
-  variant?:  Variant;
-  size?:     Size;
-  loading?:  boolean;
-  icon?:     string;
-  fullWidth?: boolean;
+  label: string
+  variant?: Variant
+  size?: Size
+  loading?: boolean
+  icon?: string
+  fullWidth?: boolean
 }
 
-const VARIANT_STYLES: Record<Variant, string> = {
-  primary:   'bg-primary border-primary',
-  secondary: 'bg-light-elevated dark:bg-dark-elevated border-light-border dark:border-dark-border',
-  outline:   'bg-transparent border-white/30',
-  ghost:     'bg-transparent border-transparent',
-  danger:    'bg-error/10 border-error/40',
-};
+export default function Button({ label, variant = 'primary', size = 'md', loading = false, icon, fullWidth = false, disabled, style, ...props }: ButtonProps) {
+  const { colors } = useTheme()
 
-const TEXT_STYLES: Record<Variant, string> = {
-  primary:   'text-white',
-  secondary: 'text-white',
-  outline:   'text-white',
-  ghost:     'text-text-muted dark:text-text-secondary',
-  danger:    'text-error',
-};
+  const variantStyle = {
+    primary: { backgroundColor: '#FF6B35', borderColor: '#FF6B35', borderWidth: 1 },
+    secondary: { backgroundColor: colors.elevated, borderColor: colors.border, borderWidth: 1 },
+    outline: { backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.3)', borderWidth: 1 },
+    ghost: { backgroundColor: 'transparent', borderColor: 'transparent', borderWidth: 1 },
+    danger: { backgroundColor: 'rgba(239,68,68,0.1)', borderColor: 'rgba(239,68,68,0.4)', borderWidth: 1 }
+  }[variant]
 
-const SIZE_STYLES: Record<Size, { button: string; text: string }> = {
-  sm: { button: 'px-4 py-2.5 rounded-xl', text: 'text-sm' },
-  md: { button: 'px-5 py-3.5 rounded-2xl', text: 'text-base' },
-  lg: { button: 'px-6 py-4 rounded-2xl',  text: 'text-base' },
-};
+  const textColor = {
+    primary: '#FFFFFF',
+    secondary: colors.text,
+    outline: colors.text,
+    ghost: colors.textMuted,
+    danger: '#EF4444'
+  }[variant]
 
-export default function Button({
-  label, variant = 'primary', size = 'md',
-  loading = false, icon, fullWidth = false,
-  disabled, ...props
-}: ButtonProps) {
-  const v = VARIANT_STYLES[variant];
-  const t = TEXT_STYLES[variant];
-  const s = SIZE_STYLES[size];
+  const sizeStyle = {
+    sm: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12 },
+    md: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 16 },
+    lg: { paddingHorizontal: 24, paddingVertical: 16, borderRadius: 16 }
+  }[size]
+
+  const fontSize = size === 'sm' ? 14 : 16
 
   return (
     <Pressable
       {...props}
       disabled={disabled || loading}
-      className={[
-        'flex-row items-center justify-center gap-2 border',
-        v, s.button,
-        fullWidth ? 'w-full' : '',
-        disabled || loading ? 'opacity-40' : 'active:opacity-75',
-      ].join(' ')}
-    >
+      style={({ pressed }) => [styles.base, variantStyle, sizeStyle, fullWidth && styles.fullWidth, (disabled || loading) && styles.disabled, pressed && styles.pressed, style as any]}>
       {loading ? (
         <ActivityIndicator size="small" color={variant === 'primary' ? '#fff' : '#FF6B35'} />
       ) : (
         <>
-          {icon && <Text className="text-base">{icon}</Text>}
-          <Text className={['font-semibold', t, s.text].join(' ')}>{label}</Text>
+          {icon && <Text style={{ fontSize: fontSize }}>{icon}</Text>}
+          <Text style={[styles.label, { color: textColor, fontSize }]}>{label}</Text>
         </>
       )}
     </Pressable>
-  );
+  )
 }
+
+const styles = StyleSheet.create({
+  base: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8
+  },
+  fullWidth: {
+    width: '100%'
+  },
+  disabled: {
+    opacity: 0.4
+  },
+  pressed: {
+    opacity: 0.75
+  },
+  label: {
+    fontWeight: '600'
+  }
+})

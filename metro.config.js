@@ -1,5 +1,5 @@
+const path = require('path')
 const { getDefaultConfig } = require('expo/metro-config')
-const { withNativeWind } = require('nativewind/metro')
 
 let config = getDefaultConfig(__dirname)
 
@@ -13,9 +13,8 @@ config.resolver = {
   ...resolver,
   assetExts: resolver.assetExts.filter(ext => ext !== 'svg'),
   sourceExts: [...resolver.sourceExts, 'svg'],
-  // Убираем mjs из приоритета — Metro будет брать CJS
   resolverMainFields: ['react-native', 'browser', 'main'],
-  unstable_enablePackageExports: false, // ← ключевое
+  unstable_enablePackageExports: false
 }
 
-module.exports = withNativeWind(config, { input: './global.css' })
+module.exports = config
