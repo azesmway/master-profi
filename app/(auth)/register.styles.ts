@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: { paddingHorizontal: s(24), paddingTop: vs(64) },
   title: { fontSize: s(28), fontWeight: '700', marginBottom: vs(8) },
   subtitle: { fontSize: s(16), marginBottom: vs(32) },
@@ -81,3 +81,5 @@ export const styles = StyleSheet.create({
   pressed: { opacity: 0.8 },
   submitText: { color: '#fff', fontSize: s(16), fontWeight: '700' }
 })
+
+export default styles

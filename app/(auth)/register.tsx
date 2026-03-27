@@ -12,7 +12,7 @@ import { authService } from '@/services/authService'
 import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types'
 
-import { styles } from './register.styles'
+import styles from './register.styles'
 
 const ROLES: Array<{ role: UserRole; title: string; desc: string; icon: string }> = [
   { role: 'client', title: 'Ищу специалиста', desc: 'Создаю заказы, нахожу мастеров', icon: '🔍' },

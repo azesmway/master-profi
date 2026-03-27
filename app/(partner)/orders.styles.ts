@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const partnerOrdersStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── List header ───────────────────────────────────────────
   listHeader: {
     paddingHorizontal: s(20),
@@ -74,3 +74,5 @@ export const partnerOrdersStyles = StyleSheet.create({
   emptyTitle: { fontSize: s(18), marginBottom: vs(8) },
   emptySubtitle: { textAlign: 'center', marginBottom: vs(20) }
 })
+
+export default styles

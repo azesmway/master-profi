@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const responsesStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────
   header: {
     paddingHorizontal: s(20),
@@ -74,3 +74,5 @@ export const responsesStyles = StyleSheet.create({
   emptyTitle: { fontSize: s(20), textAlign: 'center' },
   emptySubtitle: { textAlign: 'center', marginTop: vs(8), lineHeight: s(22) }
 })
+
+export default styles

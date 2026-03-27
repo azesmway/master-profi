@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const earningsStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   header: {
     paddingHorizontal: s(20),
     paddingVertical: vs(16),
@@ -83,3 +83,5 @@ export const earningsStyles = StyleSheet.create({
   emptyIcon: { fontSize: s(36), marginBottom: vs(8) },
   emptyText: { textAlign: 'center', marginTop: vs(4) }
 })
+
+export default styles

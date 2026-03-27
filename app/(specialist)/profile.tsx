@@ -18,7 +18,7 @@ import { api } from '@/services/api'
 import { useAuthStore } from '@/store/authStore'
 import { makeStyles } from '@/utils/makeStyles'
 
-import { profileStyles as ps } from './profile.styles'
+import styles from './profile.styles'
 
 // ─── Category picker modal ────────────────────────────────────────────────────
 
@@ -33,11 +33,11 @@ function CategoryModal({ visible, selected, onClose, onSave }: { visible: boolea
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <View style={ps.modalOverlay}>
-        <View style={[ps.modalSheet, { backgroundColor: colors.card }]}>
-          <Text style={[ps.modalTitle, { color: colors.text }]}>Категории услуг</Text>
+      <View style={styles.modalOverlay}>
+        <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
+          <Text style={[styles.modalTitle, { color: colors.text }]}>Категории услуг</Text>
           <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={ps.modalCatGrid}>
+            <View style={styles.modalCatGrid}>
               {CATEGORIES.filter(c => c.id !== '12').map(cat => {
                 const isSelected = picked.includes(cat.id)
                 return (
@@ -45,20 +45,20 @@ function CategoryModal({ visible, selected, onClose, onSave }: { visible: boolea
                     key={cat.id}
                     onPress={() => toggle(cat.id)}
                     style={[
-                      ps.modalCatBtn,
+                      styles.modalCatBtn,
                       {
                         backgroundColor: isSelected ? '#FF6B35' : colors.elevated,
                         borderColor: isSelected ? '#FF6B35' : colors.border
                       }
                     ]}>
                     <Text>{cat.icon}</Text>
-                    <Text style={[ps.modalCatText, { color: isSelected ? '#fff' : colors.text }]}>{cat.name}</Text>
+                    <Text style={[styles.modalCatText, { color: isSelected ? '#fff' : colors.text }]}>{cat.name}</Text>
                   </Pressable>
                 )
               })}
             </View>
           </ScrollView>
-          <View style={ps.modalBtnRow}>
+          <View style={styles.modalBtnRow}>
             <Pressable onPress={onClose} style={[s.buttonOutline, { flex: 1 }]}>
               <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Отмена</Text>
             </Pressable>
@@ -83,25 +83,25 @@ function PortfolioGrid({ items, onAdd, onDelete, isLoading }: { items: any[]; on
   const { colors } = useTheme()
   return (
     <View>
-      <View style={ps.portfolioHeader}>
-        <Text style={[ps.portfolioTitle, { color: colors.text }]}>Портфолио ({items.length})</Text>
-        <Pressable onPress={onAdd} style={ps.portfolioAddBtn}>
-          {isLoading ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={ps.portfolioAddText}>+ Добавить фото</Text>}
+      <View style={styles.portfolioHeader}>
+        <Text style={[styles.portfolioTitle, { color: colors.text }]}>Портфолио ({items.length})</Text>
+        <Pressable onPress={onAdd} style={styles.portfolioAddBtn}>
+          {isLoading ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={styles.portfolioAddText}>+ Добавить фото</Text>}
         </Pressable>
       </View>
-      <View style={ps.portfolioGrid}>
+      <View style={styles.portfolioGrid}>
         {items.map(item => (
           <View key={item.id} style={{ position: 'relative' }}>
-            <Image source={{ uri: item.url }} style={ps.portfolioImage} contentFit="cover" />
-            <Pressable onPress={() => onDelete(item.id)} style={ps.portfolioDeleteBtn}>
-              <Text style={ps.portfolioDeleteText}>✕</Text>
+            <Image source={{ uri: item.url }} style={styles.portfolioImage} contentFit="cover" />
+            <Pressable onPress={() => onDelete(item.id)} style={styles.portfolioDeleteBtn}>
+              <Text style={styles.portfolioDeleteText}>✕</Text>
             </Pressable>
           </View>
         ))}
         {items.length === 0 && (
-          <Pressable onPress={onAdd} style={[ps.portfolioEmpty, { borderColor: colors.border }]}>
-            <Text style={[ps.portfolioEmptyIcon, { color: colors.textMuted }]}>📷</Text>
-            <Text style={[ps.portfolioEmptyText, { color: colors.textMuted }]}>Добавить</Text>
+          <Pressable onPress={onAdd} style={[styles.portfolioEmpty, { borderColor: colors.border }]}>
+            <Text style={[styles.portfolioEmptyIcon, { color: colors.textMuted }]}>📷</Text>
+            <Text style={[styles.portfolioEmptyText, { color: colors.textMuted }]}>Добавить</Text>
           </Pressable>
         )}
       </View>
@@ -156,13 +156,13 @@ function VerificationSection({ specialistId, isVerified }: { specialistId?: stri
 
   return (
     <View>
-      <View style={ps.verRow}>
-        <Text style={ps.verIcon}>{verified ? '✅' : status === 'pending' ? '⏳' : status === 'rejected' ? '❌' : '🔐'}</Text>
-        <View style={ps.verInfo}>
-          <Text style={[ps.verTitle, { color: colors.text }]}>
+      <View style={styles.verRow}>
+        <Text style={styles.verIcon}>{verified ? '✅' : status === 'pending' ? '⏳' : status === 'rejected' ? '❌' : '🔐'}</Text>
+        <View style={styles.verInfo}>
+          <Text style={[styles.verTitle, { color: colors.text }]}>
             {verified ? 'Профиль верифицирован' : status === 'pending' ? 'Проверка документов' : status === 'rejected' ? 'Верификация отклонена' : 'Верификация профиля'}
           </Text>
-          <Text style={[ps.verSubtitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.verSubtitle, { color: colors.textSecondary }]}>
             {verified
               ? 'Вы получаете больше доверия клиентов'
               : status === 'pending'
@@ -174,7 +174,7 @@ function VerificationSection({ specialistId, isVerified }: { specialistId?: stri
         </View>
       </View>
       {!verified && status !== 'pending' && (
-        <Pressable onPress={() => applyMutation.mutate()} disabled={applyMutation.isPending || uploading} style={ps.verBtn}>
+        <Pressable onPress={() => applyMutation.mutate()} disabled={applyMutation.isPending || uploading} style={styles.verBtn}>
           {applyMutation.isPending || uploading ? (
             <ActivityIndicator size="small" color="#3B82F6" />
           ) : (
@@ -314,41 +314,41 @@ export default function SpecialistProfileScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View style={[ps.header, { borderBottomColor: colors.border }]}>
-        <Text style={[ps.headerTitle, { color: colors.text }]}>Мой профиль</Text>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Мой профиль</Text>
         <Pressable
           onPress={() => {
             if (!editing) initForm(specialist)
             setEditing(!editing)
           }}>
-          <Text style={ps.editBtn}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
+          <Text style={styles.editBtn}>{editing ? 'Отмена' : '✏️ Изменить'}</Text>
         </Pressable>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: sm(20), gap: vs(16) }}>
         {/* Avatar + info */}
-        <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, ps.avatarCard]}>
-          <Pressable onPress={pickAvatar} style={ps.avatarOuter}>
+        <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, styles.avatarCard]}>
+          <Pressable onPress={pickAvatar} style={styles.avatarOuter}>
             {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={ps.avatar} contentFit="cover" />
+              <Image source={{ uri: user.avatar }} style={styles.avatar} contentFit="cover" />
             ) : (
-              <View style={ps.avatarPlaceholder}>
-                <Text style={ps.avatarInitials}>{initials}</Text>
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarInitials}>{initials}</Text>
               </View>
             )}
-            <View style={[ps.cameraBtn, { backgroundColor: colors.card, borderColor: colors.bg }]}>
-              {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={ps.cameraIcon}>📷</Text>}
+            <View style={[styles.cameraBtn, { backgroundColor: colors.card, borderColor: colors.bg }]}>
+              {avatarMutation.isPending ? <ActivityIndicator size="small" color="#FF6B35" /> : <Text style={styles.cameraIcon}>📷</Text>}
             </View>
           </Pressable>
 
-          <Text style={[ps.avatarName, { color: colors.text }]}>{name}</Text>
-          <Text style={[ps.avatarPhone, { color: colors.textMuted }]}>{user?.phone}</Text>
-          {catNames ? <Text style={ps.avatarCats}>{catNames}</Text> : null}
+          <Text style={[styles.avatarName, { color: colors.text }]}>{name}</Text>
+          <Text style={[styles.avatarPhone, { color: colors.textMuted }]}>{user?.phone}</Text>
+          {catNames ? <Text style={styles.avatarCats}>{catNames}</Text> : null}
 
           {/* Online toggle */}
-          <View style={ps.onlineRow}>
-            <View style={[ps.onlineDot, { backgroundColor: form.isOnline ? '#22C55E' : colors.textMuted }]} />
-            <Text style={[ps.onlineText, { color: colors.textSecondary }]}>{form.isOnline ? 'Онлайн' : 'Оффлайн'}</Text>
+          <View style={styles.onlineRow}>
+            <View style={[styles.onlineDot, { backgroundColor: form.isOnline ? '#22C55E' : colors.textMuted }]} />
+            <Text style={[styles.onlineText, { color: colors.textSecondary }]}>{form.isOnline ? 'Онлайн' : 'Оффлайн'}</Text>
             <Switch
               value={form.isOnline}
               onValueChange={v => {
@@ -361,15 +361,15 @@ export default function SpecialistProfileScreen() {
           </View>
 
           {/* Stats */}
-          <View style={ps.statsRow}>
+          <View style={styles.statsRow}>
             {[
               { label: 'Рейтинг', value: `★ ${Number(specialist?.rating ?? 0).toFixed(1)}` },
               { label: 'Отзывов', value: String(specialist?.reviewCount ?? 0) },
               { label: 'Заказов', value: String(specialist?.completedOrders ?? 0) }
             ].map((stat, i) => (
-              <View key={i} style={ps.statItem}>
-                <Text style={ps.statValue}>{stat.value}</Text>
-                <Text style={[ps.statLabel, { color: colors.textMuted }]}>{stat.label}</Text>
+              <View key={i} style={styles.statItem}>
+                <Text style={styles.statValue}>{stat.value}</Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>{stat.label}</Text>
               </View>
             ))}
           </View>
@@ -378,11 +378,11 @@ export default function SpecialistProfileScreen() {
         {/* Edit form */}
         {editing && (
           <Animated.View entering={FadeInDown.delay(50).springify()} style={[s.card, { gap: vs(16) }]}>
-            <Text style={[ps.formTitle, { color: colors.text }]}>Редактирование</Text>
+            <Text style={[styles.formTitle, { color: colors.text }]}>Редактирование</Text>
 
             {/* Bio */}
             <View>
-              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>О себе</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>О себе</Text>
               <TextInput
                 value={form.bio}
                 onChangeText={v => setForm(f => ({ ...f, bio: v }))}
@@ -390,13 +390,13 @@ export default function SpecialistProfileScreen() {
                 placeholderTextColor={colors.textMuted}
                 multiline
                 numberOfLines={4}
-                style={[s.input, ps.bioInput, { outlineStyle: 'none' } as any]}
+                style={[s.input, styles.bioInput, { outlineStyle: 'none' } as any]}
               />
             </View>
 
             {/* City */}
             <View>
-              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Город</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Город</Text>
               <TextInput
                 value={form.city}
                 onChangeText={v => setForm(f => ({ ...f, city: v }))}
@@ -408,7 +408,7 @@ export default function SpecialistProfileScreen() {
 
             {/* Response time */}
             <View>
-              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Время отклика</Text>
+              <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Время отклика</Text>
               <TextInput
                 value={form.responseTime}
                 onChangeText={v => setForm(f => ({ ...f, responseTime: v }))}
@@ -420,8 +420,8 @@ export default function SpecialistProfileScreen() {
 
             {/* Price */}
             <View>
-              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Цена (₸)</Text>
-              <View style={ps.priceRow}>
+              <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Цена (₸)</Text>
+              <View style={styles.priceRow}>
                 <TextInput
                   value={form.priceFrom}
                   onChangeText={v => setForm(f => ({ ...f, priceFrom: v }))}
@@ -439,7 +439,7 @@ export default function SpecialistProfileScreen() {
                   style={[s.input, { flex: 1, outlineStyle: 'none' } as any]}
                 />
               </View>
-              <View style={ps.priceUnitRow}>
+              <View style={styles.priceUnitRow}>
                 {[
                   { key: 'hour', label: '/час' },
                   { key: 'day', label: '/день' },
@@ -448,8 +448,8 @@ export default function SpecialistProfileScreen() {
                   <Pressable
                     key={u.key}
                     onPress={() => setForm(f => ({ ...f, priceUnit: u.key }))}
-                    style={[ps.priceUnitBtn, { backgroundColor: form.priceUnit === u.key ? '#FF6B35' : colors.elevated }]}>
-                    <Text style={[ps.priceUnitText, { color: form.priceUnit === u.key ? '#fff' : colors.textMuted }]}>{u.label}</Text>
+                    style={[styles.priceUnitBtn, { backgroundColor: form.priceUnit === u.key ? '#FF6B35' : colors.elevated }]}>
+                    <Text style={[styles.priceUnitText, { color: form.priceUnit === u.key ? '#fff' : colors.textMuted }]}>{u.label}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -457,8 +457,8 @@ export default function SpecialistProfileScreen() {
 
             {/* Categories */}
             <View>
-              <Text style={[ps.fieldLabel, { color: colors.textMuted }]}>Категории услуг</Text>
-              <Pressable onPress={() => setShowCatModal(true)} style={[s.input, ps.categoryPicker]}>
+              <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Категории услуг</Text>
+              <Pressable onPress={() => setShowCatModal(true)} style={[s.input, styles.categoryPicker]}>
                 <Text style={{ color: form.categoryIds.length > 0 ? colors.text : colors.textMuted }}>
                   {form.categoryIds.length > 0
                     ? form.categoryIds
@@ -497,12 +497,12 @@ export default function SpecialistProfileScreen() {
             { icon: '🔔', label: 'Уведомления', onPress: () => {} }
           ].map((item, i, arr) => (
             <View key={i}>
-              <Pressable onPress={item.onPress} style={ps.menuRow}>
-                <Text style={ps.menuIcon}>{item.icon}</Text>
-                <Text style={[ps.menuLabel, { color: colors.text }]}>{item.label}</Text>
-                <Text style={[ps.menuArrow, { color: colors.textMuted }]}>›</Text>
+              <Pressable onPress={item.onPress} style={styles.menuRow}>
+                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{item.label}</Text>
+                <Text style={[styles.menuArrow, { color: colors.textMuted }]}>›</Text>
               </Pressable>
-              {i < arr.length - 1 && <View style={[ps.menuDivider, { backgroundColor: colors.border }]} />}
+              {i < arr.length - 1 && <View style={[styles.menuDivider, { backgroundColor: colors.border }]} />}
             </View>
           ))}
         </Animated.View>

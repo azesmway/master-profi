@@ -12,7 +12,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { specialistsService } from '@/services/specialistsService'
 import { makeStyles } from '@/utils/makeStyles'
 
-import { searchStyles as ss } from './search.styles'
+import styles from './search.styles'
 
 const SORT_OPTIONS = [
   { key: 'rating', label: 'По рейтингу' },
@@ -26,9 +26,9 @@ type SortKey = (typeof SORT_OPTIONS)[number]['key']
 
 function AiThinkingBadge() {
   return (
-    <View style={ss.aiBadge}>
-      <Text style={ss.aiBadgeIcon}>✨</Text>
-      <Text style={ss.aiBadgeText}>AI анализирует задачу и подбирает специалистов...</Text>
+    <View style={styles.aiBadge}>
+      <Text style={styles.aiBadgeIcon}>✨</Text>
+      <Text style={styles.aiBadgeText}>AI анализирует задачу и подбирает специалистов...</Text>
       <ActivityIndicator size="small" color="#FF6B35" />
     </View>
   )
@@ -80,10 +80,10 @@ export default function SearchScreen() {
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         {/* Search bar */}
-        <View style={ss.searchBarWrap}>
-          <View style={ss.searchRow}>
-            <View style={[s.input, ss.searchInputWrap]}>
-              <Text style={ss.searchIcon}>🔍</Text>
+        <View style={styles.searchBarWrap}>
+          <View style={styles.searchRow}>
+            <View style={[s.input, styles.searchInputWrap]}>
+              <Text style={styles.searchIcon}>🔍</Text>
               <TextInput
                 value={query}
                 onChangeText={t => {
@@ -92,18 +92,18 @@ export default function SearchScreen() {
                 }}
                 placeholder="Поиск специалиста или задачи..."
                 placeholderTextColor={colors.textMuted}
-                style={[ss.searchInput, { color: colors.text, outlineStyle: 'none' } as any]}
+                style={[styles.searchInput, { color: colors.text, outlineStyle: 'none' } as any]}
                 returnKeyType="search"
                 autoFocus={!!params.q}
               />
               {query.length > 0 && (
-                <Pressable onPress={() => setQuery('')} style={ss.searchClearBtn}>
+                <Pressable onPress={() => setQuery('')} style={styles.searchClearBtn}>
                   <Text style={{ color: colors.textMuted }}>✕</Text>
                 </Pressable>
               )}
             </View>
             <Pressable onPress={() => router.back()}>
-              <Text style={ss.searchCancelBtn}>Отмена</Text>
+              <Text style={styles.searchCancelBtn}>Отмена</Text>
             </Pressable>
           </View>
         </View>
@@ -114,11 +114,11 @@ export default function SearchScreen() {
             <ActivityIndicator size="large" color="#FF6B35" />
           </View>
         ) : isError ? (
-          <View style={ss.errorWrap}>
-            <Text style={ss.errorIcon}>⚠️</Text>
-            <Text style={[ss.errorTitle, { color: colors.text }]}>Ошибка загрузки</Text>
-            <Pressable onPress={() => refetch()} style={ss.errorBtn}>
-              <Text style={ss.errorBtnText}>Повторить</Text>
+          <View style={styles.errorWrap}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={[styles.errorTitle, { color: colors.text }]}>Ошибка загрузки</Text>
+            <Pressable onPress={() => refetch()} style={styles.errorBtn}>
+              <Text style={styles.errorBtnText}>Повторить</Text>
             </Pressable>
           </View>
         ) : (
@@ -142,14 +142,14 @@ export default function SearchScreen() {
                         key={item.id ?? 'all'}
                         onPress={() => setActiveCategory(item.id ?? null)}
                         style={[
-                          ss.catChip,
+                          styles.catChip,
                           {
                             backgroundColor: isActive ? '#FF6B35' : colors.card,
                             borderColor: isActive ? '#FF6B35' : colors.textMuted + '30'
                           }
                         ]}>
-                        <Text style={ss.catChipIcon}>{item.icon}</Text>
-                        <Text style={[ss.catChipText, { color: isActive ? '#fff' : colors.textMuted }]}>{item.name}</Text>
+                        <Text style={styles.catChipIcon}>{item.icon}</Text>
+                        <Text style={[styles.catChipText, { color: isActive ? '#fff' : colors.textMuted }]}>{item.name}</Text>
                       </Pressable>
                     )
                   })}
@@ -168,13 +168,13 @@ export default function SearchScreen() {
                         key={item.key}
                         onPress={() => setSortBy(item.key)}
                         style={[
-                          ss.sortChip,
+                          styles.sortChip,
                           {
                             backgroundColor: isActive ? colors.elevated : 'transparent',
                             borderColor: isActive ? colors.textMuted + '60' : colors.textMuted + '30'
                           }
                         ]}>
-                        <Text style={[ss.sortChipText, { fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }]}>{item.label}</Text>
+                        <Text style={[styles.sortChipText, { fontWeight: isActive ? '600' : '400', color: isActive ? colors.text : colors.textMuted }]}>{item.label}</Text>
                       </Pressable>
                     )
                   })}
@@ -182,17 +182,17 @@ export default function SearchScreen() {
 
                 {/* Status */}
                 {aiLoading && <AiThinkingBadge />}
-                {!aiLoading && <Text style={[ss.statusText, { color: colors.textMuted }]}>Найдено: {total} специалистов</Text>}
+                {!aiLoading && <Text style={[styles.statusText, { color: colors.textMuted }]}>Найдено: {total} специалистов</Text>}
               </>
             }
             ListEmptyComponent={
               !aiLoading ? (
-                <View style={ss.emptyWrap}>
-                  <Text style={ss.emptyIcon}>🔍</Text>
-                  <Text style={[ss.emptyTitle, { color: colors.text }]}>Ничего не найдено</Text>
-                  <Text style={[ss.emptySubtitle, { color: colors.textSecondary }]}>Попробуйте изменить запрос или создать заказ</Text>
-                  <Pressable onPress={() => router.push('/create-order')} style={ss.emptyBtn}>
-                    <Text style={ss.emptyBtnText}>Создать заказ</Text>
+                <View style={styles.emptyWrap}>
+                  <Text style={styles.emptyIcon}>🔍</Text>
+                  <Text style={[styles.emptyTitle, { color: colors.text }]}>Ничего не найдено</Text>
+                  <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Попробуйте изменить запрос или создать заказ</Text>
+                  <Pressable onPress={() => router.push('/create-order')} style={styles.emptyBtn}>
+                    <Text style={styles.emptyBtnText}>Создать заказ</Text>
                   </Pressable>
                 </View>
               ) : null

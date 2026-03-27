@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { ActivityIndicator, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import PaymentBlock from '@/components/client/PaymentBlock'
 import { CATEGORIES, ORDER_STATUS_COLOR, ORDER_STATUS_LABEL, QUERY_KEYS } from '@/constants'
@@ -13,6 +14,8 @@ import { api } from '@/services/api'
 import { ordersService } from '@/services/ordersService'
 import { useAuthStore } from '@/store/authStore'
 import { makeStyles } from '@/utils/makeStyles'
+
+import styles from './id.styles'
 
 // ─── Standard Response Modal ──────────────────────────────────────────────────
 
@@ -24,12 +27,12 @@ function ResponseModal({ visible, onClose, onSubmit, isLoading }: { visible: boo
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }} onPress={onClose}>
-        <Pressable style={{ backgroundColor: colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, gap: 16 }}>
-          <Text style={[s.textTitle, { fontSize: 20 }]}>Ваш отклик</Text>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Pressable style={[styles.modalSheet, { backgroundColor: colors.card }]}>
+          <Text style={[styles.modalTitle, { color: colors.text }]}>Ваш отклик</Text>
 
           <View>
-            <Text style={[s.textMuted, { marginBottom: 8 }]}>Сообщение клиенту *</Text>
+            <Text style={[styles.modalFieldLabel, { color: colors.textMuted }]}>Сообщение клиенту *</Text>
             <TextInput
               value={message}
               onChangeText={setMessage}
@@ -37,16 +40,16 @@ function ResponseModal({ visible, onClose, onSubmit, isLoading }: { visible: boo
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={4}
-              style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
+              style={[s.input, { height: vs(100), textAlignVertical: 'top', paddingTop: vs(12), outlineStyle: 'none' } as any]}
             />
           </View>
 
           <View>
-            <Text style={[s.textMuted, { marginBottom: 8 }]}>Ваша цена (₸) *</Text>
-            <TextInput value={price} onChangeText={setPrice} placeholder="8000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={[s.input, { outlineStyle: 'none' }]} />
+            <Text style={[styles.modalFieldLabel, { color: colors.textMuted }]}>Ваша цена (₸) *</Text>
+            <TextInput value={price} onChangeText={setPrice} placeholder="8000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={[s.input, { outlineStyle: 'none' } as any]} />
           </View>
 
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={styles.modalBtnRow}>
             <Pressable onPress={onClose} style={[s.buttonOutline, { flex: 1 }]}>
               <Text style={[s.textLabel, { color: colors.textSecondary }]}>Отмена</Text>
             </Pressable>
@@ -99,30 +102,27 @@ function BarterResponseModal({
 
   return (
     <Modal visible={visible} transparent animationType="slide">
-      <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }} onPress={onClose}>
-        <Pressable style={{ backgroundColor: colors.card, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, gap: 16 }}>
-          {/* Header */}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <Text style={{ fontSize: 24 }}>🔄</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={[s.textTitle, { fontSize: 18 }]}>Отклик на бартер</Text>
-              <Text style={[s.textMuted, { fontSize: 12 }]} numberOfLines={1}>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Pressable style={[styles.modalSheet, { backgroundColor: colors.card }]}>
+          <View style={styles.modalHeaderRow}>
+            <Text style={styles.modalHeaderIcon}>🔄</Text>
+            <View style={styles.modalHeaderInfo}>
+              <Text style={[styles.modalHeaderTitle, { color: colors.text }]}>Отклик на бартер</Text>
+              <Text style={[styles.modalHeaderSub, { color: colors.textMuted }]} numberOfLines={1}>
                 {order?.title}
               </Text>
             </View>
           </View>
 
-          {/* Что предлагает клиент */}
           {order?.barterClientOffer && (
-            <View style={{ backgroundColor: '#8B5CF615', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#8B5CF630' }}>
-              <Text style={{ color: '#8B5CF6', fontWeight: '700', fontSize: 12, marginBottom: 6 }}>💼 Клиент предлагает взамен:</Text>
-              <Text style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>{order.barterClientOffer}</Text>
+            <View style={styles.barterClientOffer}>
+              <Text style={styles.barterOfferLabel}>💼 Клиент предлагает взамен:</Text>
+              <Text style={[styles.barterOfferText, { color: colors.text }]}>{order.barterClientOffer}</Text>
             </View>
           )}
 
-          {/* Сообщение */}
           <View>
-            <Text style={[s.textMuted, { marginBottom: 6 }]}>Сообщение клиенту *</Text>
+            <Text style={[styles.modalFieldLabelSm, { color: colors.textMuted }]}>Сообщение клиенту *</Text>
             <TextInput
               value={message}
               onChangeText={t => {
@@ -133,57 +133,54 @@ function BarterResponseModal({
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
+              style={[s.input, { height: vs(80), textAlignVertical: 'top', paddingTop: vs(12), outlineStyle: 'none' } as any]}
             />
-            {errors.message && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.message}</Text>}
+            {errors.message && <Text style={styles.errorText}>{errors.message}</Text>}
           </View>
 
-          {/* Что хочет мастер */}
           <View>
-            <Text style={[s.textMuted, { marginBottom: 6 }]}>Что вы хотите получить взамен? *</Text>
+            <Text style={[styles.modalFieldLabelSm, { color: colors.textMuted }]}>Что вы хотите получить взамен? *</Text>
             <TextInput
               value={want}
               onChangeText={t => {
                 setWant(t)
                 setErrors(e => ({ ...e, want: '' }))
               }}
-              placeholder="Опишите желаемую оплату за ваши услуги..."
+              placeholder="Например: Ремонт велосипеда, юридическая консультация..."
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={3}
-              style={[s.input, { height: 80, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
+              style={[s.input, { height: vs(80), textAlignVertical: 'top', paddingTop: vs(12), outlineStyle: 'none' } as any]}
             />
-            {errors.want && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.want}</Text>}
+            {errors.want && <Text style={styles.errorText}>{errors.want}</Text>}
           </View>
 
-          {/* Комиссия платформе */}
           <View>
-            <Text style={[s.textMuted, { marginBottom: 4 }]}>Комиссия платформе (₸) *</Text>
-            <Text style={[s.textMuted, { fontSize: 11, marginBottom: 8, opacity: 0.7, lineHeight: 16 }]}>Сумма которую вы готовы заплатить платформе из стоимости ваших услуг</Text>
+            <Text style={[styles.modalFieldLabelSm, { color: colors.textMuted }]}>Комиссия платформе (₸) *</Text>
             <TextInput
               value={fee}
               onChangeText={t => {
                 setFee(t)
                 setErrors(e => ({ ...e, fee: '' }))
               }}
-              placeholder="Например: 2000"
+              placeholder="500"
               placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
-              style={[s.input, { outlineStyle: 'none' }]}
+              style={[s.input, { outlineStyle: 'none' } as any]}
             />
-            {errors.fee && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.fee}</Text>}
+            {errors.fee && <Text style={styles.errorText}>{errors.fee}</Text>}
+            <Text style={[styles.feeHint, { color: colors.textMuted }]}>Минимальная комиссия платформе за проведение бартера</Text>
           </View>
 
-          {/* Buttons */}
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={styles.modalBtnRow}>
             <Pressable onPress={onClose} style={[s.buttonOutline, { flex: 1 }]}>
-              <Text style={[s.textLabel, { color: colors.textSecondary }]}>Отмена</Text>
+              <Text style={{ color: colors.textSecondary, fontWeight: '600' }}>Отмена</Text>
             </Pressable>
             <Pressable
-              onPress={() => validate() && onSubmit({ message: message.trim(), barterSpecialistWant: want.trim(), barterPlatformFee: parseInt(fee) })}
+              onPress={() => validate() && onSubmit({ message, barterSpecialistWant: want, barterPlatformFee: parseInt(fee) })}
               disabled={isLoading}
-              style={[{ flex: 2, backgroundColor: '#8B5CF6', paddingVertical: 14, borderRadius: 14, alignItems: 'center', opacity: isLoading ? 0.6 : 1 }]}>
-              {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700' }}>🔄 Откликнуться</Text>}
+              style={[{ flex: 2, backgroundColor: '#8B5CF6', borderRadius: sm(16), paddingVertical: vs(16), alignItems: 'center' }]}>
+              {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontWeight: '700', fontSize: sm(15) }}>Предложить условия</Text>}
             </Pressable>
           </View>
         </Pressable>
@@ -192,7 +189,7 @@ function BarterResponseModal({
   )
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
+// ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function OrderDetailScreen() {
   const router = useRouter()
@@ -219,7 +216,6 @@ export default function OrderDetailScreen() {
   const statusColor = ORDER_STATUS_COLOR[order?.status] ?? '#6B7280'
   const catName = CATEGORIES.find(c => c.id === String(order?.categoryId))?.name ?? ''
 
-  // Стандартный отклик
   const responseMutation = useMutation({
     mutationFn: (data: { message: string; price: number }) => ordersService.createResponse(id ?? '', data),
     onSuccess: () => {
@@ -228,11 +224,9 @@ export default function OrderDetailScreen() {
     }
   })
 
-  // Бартер-отклик специалиста
   const barterResponseMutation = useMutation({
     mutationFn: (data: { message: string; barterSpecialistWant: string; barterPlatformFee: number }) =>
       api.post(`/orders/${id}/responses`, { message: data.message, price: 0 }).then(async (r: any) => {
-        // После создания отклика — обновляем бартер-поля
         await api.patch(`/orders/responses/${r.data.id}/barter`, {
           barterSpecialistWant: data.barterSpecialistWant,
           barterPlatformFee: data.barterPlatformFee
@@ -245,7 +239,6 @@ export default function OrderDetailScreen() {
     }
   })
 
-  // Принять отклик
   const acceptMutation = useMutation({
     mutationFn: (responseId: string) => ordersService.acceptResponse(responseId),
     onSuccess: (res: any) => {
@@ -258,7 +251,7 @@ export default function OrderDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }]}>
+      <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#FF6B35" />
       </View>
     )
@@ -275,67 +268,64 @@ export default function OrderDetailScreen() {
   return (
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ paddingHorizontal: 20, paddingTop: 16, gap: 16, paddingBottom: 20 }}>
-          {/* Header */}
+        <View style={styles.page}>
+          {/* Header: back + badges + title */}
           <Animated.View entering={FadeInDown.springify()}>
-            <Pressable onPress={() => router.back()} style={{ marginBottom: 12 }}>
-              <Text style={{ color: '#FF6B35', fontSize: 16 }}>← Назад</Text>
+            <Pressable onPress={() => router.back()} style={styles.backBtn}>
+              <Text style={styles.backText}>← Назад</Text>
             </Pressable>
 
-            {/* Badges */}
-            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-              <View style={{ backgroundColor: statusColor + '20', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20 }}>
-                <Text style={{ color: statusColor, fontSize: 12, fontWeight: '700' }}>{ORDER_STATUS_LABEL[order.status] ?? order.status}</Text>
+            <View style={styles.badgesRow}>
+              <View style={[styles.badge, { backgroundColor: statusColor + '20' }]}>
+                <Text style={[styles.badgeText, { color: statusColor }]}>{ORDER_STATUS_LABEL[order.status] ?? order.status}</Text>
               </View>
               {isBarter && (
-                <View style={{ backgroundColor: '#8B5CF620', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#8B5CF640' }}>
-                  <Text style={{ color: '#8B5CF6', fontSize: 12, fontWeight: '700' }}>🔄 Бартер</Text>
+                <View style={styles.barterBadge}>
+                  <Text style={styles.barterBadgeText}>🔄 Бартер</Text>
                 </View>
               )}
               {order.partnerId && (
-                <View style={{ backgroundColor: '#10B98120', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20 }}>
-                  <Text style={{ color: '#10B981', fontSize: 12, fontWeight: '700' }}>🤝 Партнёрский</Text>
+                <View style={styles.partnerBadge}>
+                  <Text style={styles.partnerBadgeText}>🤝 Партнёрский</Text>
                 </View>
               )}
               {catName ? (
-                <View style={{ backgroundColor: colors.elevated, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20 }}>
-                  <Text style={[s.textMuted, { fontSize: 12 }]}>{catName}</Text>
+                <View style={[styles.catBadge, { backgroundColor: colors.elevated }]}>
+                  <Text style={[styles.catBadgeText, { color: colors.textMuted }]}>{catName}</Text>
                 </View>
               ) : null}
             </View>
 
-            <Text style={[s.textTitle, { fontSize: 22, marginBottom: 8 }]}>{order.title}</Text>
-            <Text style={[s.textSecondary, { lineHeight: 22 }]}>{order.description}</Text>
+            <Text style={[styles.orderTitle, { color: colors.text }]}>{order.title}</Text>
+            <Text style={[styles.orderDesc, { color: colors.textSecondary }]}>{order.description}</Text>
           </Animated.View>
 
-          {/* Barter block — что предлагает клиент */}
+          {/* Barter block */}
           {isBarter && (
-            <Animated.View entering={FadeInDown.delay(50).springify()} style={{ gap: 12 }}>
-              {/* Предложение клиента */}
-              <View style={{ backgroundColor: '#8B5CF615', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#8B5CF630' }}>
-                <Text style={{ color: '#8B5CF6', fontWeight: '700', fontSize: 13, marginBottom: 8 }}>💼 Клиент предлагает взамен:</Text>
-                <Text style={{ color: colors.text, fontSize: 15, lineHeight: 22 }}>{order.barterClientOffer ?? '—'}</Text>
+            <Animated.View entering={FadeInDown.delay(50).springify()} style={{ gap: vs(12) }}>
+              <View style={styles.barterClientBlock}>
+                <Text style={styles.barterClientLabel}>💼 Клиент предлагает взамен:</Text>
+                <Text style={[styles.barterClientText, { color: colors.text }]}>{order.barterClientOffer ?? '—'}</Text>
               </View>
 
-              {/* Условия мастера (если заполнены) */}
               {order.barterSpecialistWant ? (
-                <View style={{ backgroundColor: '#FF6B3515', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#FF6B3530' }}>
-                  <Text style={{ color: '#FF6B35', fontWeight: '700', fontSize: 13, marginBottom: 8 }}>🛠️ Мастер хочет получить:</Text>
-                  <Text style={{ color: colors.text, fontSize: 15, lineHeight: 22 }}>{order.barterSpecialistWant}</Text>
-                  {order.barterPlatformFee > 0 && <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 8 }}>Комиссия платформе: {order.barterPlatformFee.toLocaleString()} ₸</Text>}
+                <View style={styles.barterSpecialistBlock}>
+                  <Text style={styles.barterSpecialistLabel}>🛠️ Мастер хочет получить:</Text>
+                  <Text style={[styles.barterSpecialistText, { color: colors.text }]}>{order.barterSpecialistWant}</Text>
+                  {order.barterPlatformFee > 0 && <Text style={[styles.barterFeeText, { color: colors.textMuted }]}>Комиссия платформе: {order.barterPlatformFee.toLocaleString()} ₸</Text>}
                 </View>
               ) : isSpecialist && order.status === 'published' ? (
-                <View style={{ backgroundColor: colors.elevated, borderRadius: 16, padding: 14 }}>
-                  <Text style={[s.textMuted, { textAlign: 'center', fontSize: 13 }]}>Ещё никто не предложил условия. Станьте первым!</Text>
+                <View style={[styles.barterNoOffers, { backgroundColor: colors.elevated }]}>
+                  <Text style={[styles.barterNoOffersText, { color: colors.textMuted }]}>Ещё никто не предложил условия. Станьте первым!</Text>
                 </View>
               ) : null}
             </Animated.View>
           )}
 
           {/* Order details */}
-          <Animated.View entering={FadeInDown.delay(100).springify()} style={[s.card, { gap: 10 }]}>
+          <Animated.View entering={FadeInDown.delay(100).springify()} style={[s.card, styles.detailsCard]}>
             {!isBarter && order.budgetFrom && (
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.detailRow}>
                 <Text style={s.textMuted}>💰 Бюджет</Text>
                 <Text style={[s.textLabel, { color: '#FF6B35' }]}>
                   {order.budgetFrom.toLocaleString()}
@@ -344,43 +334,43 @@ export default function OrderDetailScreen() {
               </View>
             )}
             {order.city && (
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.detailRow}>
                 <Text style={s.textMuted}>📍 Город</Text>
                 <Text style={s.textLabel}>{order.city}</Text>
               </View>
             )}
             {order.responseCount > 0 && (
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <View style={styles.detailRow}>
                 <Text style={s.textMuted}>📨 Откликов</Text>
                 <Text style={s.textLabel}>{order.responseCount}</Text>
               </View>
             )}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View style={styles.detailRow}>
               <Text style={s.textMuted}>📅 Создан</Text>
               <Text style={s.textLabel}>{new Date(order.createdAt).toLocaleDateString('ru', { day: 'numeric', month: 'long' })}</Text>
             </View>
           </Animated.View>
 
-          {/* Partner info block (виден клиенту/партнёру) */}
+          {/* Partner info */}
           {order.partnerId && (isClient || isPartner) && (
-            <Animated.View entering={FadeInDown.delay(120).springify()} style={{ backgroundColor: '#10B98115', borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#10B98130', gap: 8 }}>
-              <Text style={{ color: '#10B981', fontWeight: '700', fontSize: 13 }}>🤝 Партнёрский заказ</Text>
+            <Animated.View entering={FadeInDown.delay(120).springify()} style={styles.partnerBlock}>
+              <Text style={styles.partnerBlockTitle}>🤝 Партнёрский заказ</Text>
               {order.partnerClientName && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={styles.detailRow}>
                   <Text style={s.textMuted}>Клиент</Text>
                   <Text style={s.textLabel}>{order.partnerClientName}</Text>
                 </View>
               )}
               {order.partnerClientPhone && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={styles.detailRow}>
                   <Text style={s.textMuted}>Телефон</Text>
                   <Text style={s.textLabel}>{order.partnerClientPhone}</Text>
                 </View>
               )}
               {order.partnerCommissionPercent > 0 && (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={styles.detailRow}>
                   <Text style={s.textMuted}>Комиссия партнёра</Text>
-                  <Text style={{ color: '#10B981', fontWeight: '700' }}>{order.partnerCommissionPercent}%</Text>
+                  <Text style={styles.partnerCommission}>{order.partnerCommissionPercent}%</Text>
                 </View>
               )}
             </Animated.View>
@@ -389,50 +379,40 @@ export default function OrderDetailScreen() {
           {/* Responses */}
           {isClient && order.responses?.length > 0 && (
             <Animated.View entering={FadeInDown.delay(150).springify()}>
-              <Text style={[s.textTitle, { fontSize: 18, marginBottom: 12 }]}>Отклики ({order.responses.length})</Text>
-              <View style={{ gap: 12 }}>
+              <Text style={[styles.responsesTitle, { color: colors.text }]}>Отклики ({order.responses.length})</Text>
+              <View style={styles.responsesGap}>
                 {order.responses.map((resp: any, index: number) => (
-                  <Animated.View key={resp.id} entering={FadeInDown.delay(200 + index * 60).springify()} style={[s.card, { gap: 12 }]}>
-                    {/* Specialist info */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: '#FF6B3520', alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ color: '#FF6B35', fontWeight: '700' }}>{resp.specialist?.user?.name?.[0] ?? '?'}</Text>
+                  <Animated.View key={resp.id} entering={FadeInDown.delay(200 + index * 60).springify()} style={[s.card, { gap: vs(12) }]}>
+                    <View style={styles.respSpecialistRow}>
+                      <View style={styles.respAvatar}>
+                        <Text style={styles.respAvatarText}>{resp.specialist?.user?.name?.[0] ?? '?'}</Text>
                       </View>
                       <View style={{ flex: 1 }}>
-                        <Text style={s.textLabel}>{resp.specialist?.user?.name ?? 'Специалист'}</Text>
-                        <Text style={[s.textMuted, { fontSize: 12 }]}>
+                        <Text style={[styles.respName, { color: colors.text }]}>{resp.specialist?.user?.name ?? 'Специалист'}</Text>
+                        <Text style={[styles.respMeta, { color: colors.textMuted }]}>
                           ⭐ {Number(resp.specialist?.rating ?? 0).toFixed(1)} · {resp.specialist?.completedOrders ?? 0} заказов
                         </Text>
                       </View>
-                      {!isBarter && <Text style={{ color: '#FF6B35', fontWeight: '700', fontSize: 16 }}>{resp.price?.toLocaleString()} ₸</Text>}
                     </View>
 
-                    {/* Message */}
-                    <Text style={[s.textSecondary, { lineHeight: 20 }]}>{resp.message}</Text>
+                    {resp.message && <Text style={[styles.respMessage, { color: colors.textSecondary }]}>{resp.message}</Text>}
 
-                    {/* Barter specialist conditions */}
-                    {isBarter && order.barterSpecialistWant && resp.specialistId === order.responses?.find((r: any) => r.status === 'accepted')?.specialistId && (
-                      <View style={{ backgroundColor: '#FF6B3510', borderRadius: 12, padding: 12 }}>
-                        <Text style={{ color: '#FF6B35', fontSize: 12, fontWeight: '700', marginBottom: 4 }}>Условия мастера:</Text>
-                        <Text style={[s.textSecondary, { fontSize: 13 }]}>{order.barterSpecialistWant}</Text>
-                      </View>
-                    )}
+                    <View style={styles.respPriceRow}>
+                      <Text style={styles.respPrice}>{Number(resp.price).toLocaleString()} ₸</Text>
+                      <Text style={[styles.respDate, { color: colors.textMuted }]}>{new Date(resp.createdAt).toLocaleDateString('ru', { day: 'numeric', month: 'short' })}</Text>
+                    </View>
 
-                    {/* Actions */}
                     {resp.status === 'pending' && order.status === 'published' && (
-                      <View style={{ flexDirection: 'row', gap: 10 }}>
-                        <Pressable onPress={() => router.push(`/specialist/${resp.specialistId}`)} style={[s.buttonOutline, { flex: 1 }]}>
-                          <Text style={[s.textLabel, { color: colors.textSecondary, fontSize: 13 }]}>Профиль</Text>
-                        </Pressable>
-                        <Pressable onPress={() => acceptMutation.mutate(resp.id)} disabled={acceptMutation.isPending} style={[s.buttonPrimary, { flex: 2 }]}>
+                      <View style={{ flexDirection: 'row', gap: sm(12) }}>
+                        <Pressable onPress={() => acceptMutation.mutate(resp.id)} disabled={acceptMutation.isPending} style={[s.buttonPrimary, { flex: 1 }]}>
                           {acceptMutation.isPending ? <ActivityIndicator color="#fff" size="small" /> : <Text style={s.buttonText}>✓ Принять → Чат</Text>}
                         </Pressable>
                       </View>
                     )}
 
                     {resp.status === 'accepted' && (
-                      <View style={{ backgroundColor: '#22C55E20', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-                        <Text style={{ color: '#22C55E', fontWeight: '600' }}>✓ Принят</Text>
+                      <View style={styles.acceptedBadge}>
+                        <Text style={styles.acceptedText}>✓ Принят</Text>
                       </View>
                     )}
                   </Animated.View>
@@ -441,12 +421,12 @@ export default function OrderDetailScreen() {
             </Animated.View>
           )}
 
-          {/* Нет откликов */}
+          {/* No responses */}
           {isClient && (!order.responses || order.responses.length === 0) && (
-            <View style={[s.card, { alignItems: 'center', paddingVertical: 32 }]}>
-              <Text style={{ fontSize: 36, marginBottom: 8 }}>📭</Text>
-              <Text style={s.textLabel}>Пока нет откликов</Text>
-              <Text style={[s.textMuted, { textAlign: 'center', marginTop: 4 }]}>{isBarter ? 'Мастера увидят ваш бартер и предложат условия' : 'Специалисты увидят ваш заказ и откликнутся'}</Text>
+            <View style={[s.card, styles.noRespCard]}>
+              <Text style={styles.noRespIcon}>📭</Text>
+              <Text style={[s.textLabel, { color: colors.text }]}>Пока нет откликов</Text>
+              <Text style={[styles.noRespText, { color: colors.textMuted }]}>{isBarter ? 'Мастера увидят ваш бартер и предложат условия' : 'Специалисты увидят ваш заказ и откликнутся'}</Text>
             </View>
           )}
 
@@ -455,16 +435,15 @@ export default function OrderDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* CTA — специалист */}
+      {/* CTA — specialist */}
       {isSpecialist && order.status === 'published' && (
-        <View style={{ paddingHorizontal: 20, paddingBottom: insets.bottom + 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.bg }}>
+        <View style={[styles.ctaBar, { paddingBottom: insets.bottom + vs(12), borderTopColor: colors.border, backgroundColor: colors.bg }]}>
           <Pressable onPress={() => setShowModal(true)} style={[s.buttonPrimary, isBarter && { backgroundColor: '#8B5CF6' }]}>
             <Text style={s.buttonText}>{isBarter ? '🔄 Предложить условия бартера' : '📨 Откликнуться на заказ'}</Text>
           </Pressable>
         </View>
       )}
 
-      {/* Modals */}
       {isBarter ? (
         <BarterResponseModal
           visible={showModal}

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   header: {
     paddingHorizontal: s(20),
     paddingTop: vs(16),
@@ -82,3 +82,5 @@ export const styles = StyleSheet.create({
     paddingBottom: vs(24)
   }
 })
+
+export default styles

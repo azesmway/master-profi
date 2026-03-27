@@ -9,7 +9,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated'
 import { getApiError } from '@/services/api'
 import { authService } from '@/services/authService'
 
-import { styles } from './phone.styles'
+import styles from './phone.styles'
 
 const COUNTRY_CODES = [
   { code: '+7', flag: '🇷🇺', name: 'RU' },

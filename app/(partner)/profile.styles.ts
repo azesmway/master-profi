@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const partnerProfileStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── Page header ───────────────────────────────────────────
   pageHeader: {
     flexDirection: 'row',
@@ -71,3 +71,5 @@ export const partnerProfileStyles = StyleSheet.create({
   logoutBtn: { marginTop: vs(24), borderColor: '#EF4444' },
   logoutText: { color: '#EF4444', fontWeight: '600', fontSize: s(15) }
 })
+
+export default styles

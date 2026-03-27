@@ -16,7 +16,7 @@ import { useAuthStore } from '@/store/authStore'
 import type { Specialist } from '@/types'
 import { makeStyles } from '@/utils/makeStyles'
 
-import { styles } from './home.styles'
+import styles from './home.styles'
 
 const WHISPER_URL = process.env.EXPO_PUBLIC_WHISPER_URL ?? 'https://api.it-trend.dev/whisper'
 

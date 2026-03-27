@@ -11,7 +11,7 @@ import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/services/api'
 import { makeStyles } from '@/utils/makeStyles'
 
-import { partnerOrdersStyles as pos } from './orders.styles'
+import styles from './orders.styles'
 
 const STATUS_COLOR: Record<string, { label: string; color: string; bg: string }> = {
   published: { label: 'Опубликован', color: '#3B82F6', bg: '#3B82F620' },
@@ -37,44 +37,44 @@ function PartnerOrderCard({ item, onPress }: { item: any; onPress: () => void })
   return (
     <Pressable onPress={onPress} style={[s.card, { gap: vs(12) }]}>
       {/* Header: title + status */}
-      <View style={pos.cardTopRow}>
-        <View style={pos.cardTitleWrap}>
-          <Text style={[pos.cardTitle, { color: colors.text }]} numberOfLines={2}>
+      <View style={styles.cardTopRow}>
+        <View style={styles.cardTitleWrap}>
+          <Text style={[styles.cardTitle, { color: colors.text }]} numberOfLines={2}>
             {item.title}
           </Text>
-          {catName ? <Text style={[pos.cardCatName, { color: colors.textMuted }]}>{catName}</Text> : null}
+          {catName ? <Text style={[styles.cardCatName, { color: colors.textMuted }]}>{catName}</Text> : null}
         </View>
-        <View style={[pos.statusBadge, { backgroundColor: st.bg }]}>
-          <Text style={[pos.statusBadgeText, { color: st.color }]}>{st.label}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: st.bg }]}>
+          <Text style={[styles.statusBadgeText, { color: st.color }]}>{st.label}</Text>
         </View>
       </View>
 
       {/* Financials */}
-      <View style={[pos.financialsBox, { backgroundColor: colors.elevated }]}>
-        <View style={pos.finRow}>
+      <View style={[styles.financialsBox, { backgroundColor: colors.elevated }]}>
+        <View style={styles.finRow}>
           <Text style={s.textMuted}>Сумма заказа</Text>
           <Text style={s.textLabel}>{budget.toLocaleString()} ₸</Text>
         </View>
-        <View style={pos.finRow}>
+        <View style={styles.finRow}>
           <Text style={s.textMuted}>Моя комиссия ({item.partnerCommissionPercent}%)</Text>
-          <Text style={pos.finCommission}>{partnerEarns.toLocaleString()} ₸</Text>
+          <Text style={styles.finCommission}>{partnerEarns.toLocaleString()} ₸</Text>
         </View>
-        <View style={pos.finRow}>
+        <View style={styles.finRow}>
           <Text style={s.textMuted}>Комиссия платформы</Text>
-          <Text style={pos.finPlatformCut}>− {platformCut.toLocaleString()} ₸</Text>
+          <Text style={styles.finPlatformCut}>− {platformCut.toLocaleString()} ₸</Text>
         </View>
-        <View style={[pos.finDivider, { backgroundColor: colors.border }]} />
-        <View style={pos.finTotalRow}>
-          <Text style={pos.finTotalLabel}>{item.partnerPaid ? '✓ Выплачено' : 'К выплате'}</Text>
-          <Text style={pos.finTotalValue}>{partnerNet.toLocaleString()} ₸</Text>
+        <View style={[styles.finDivider, { backgroundColor: colors.border }]} />
+        <View style={styles.finTotalRow}>
+          <Text style={styles.finTotalLabel}>{item.partnerPaid ? '✓ Выплачено' : 'К выплате'}</Text>
+          <Text style={styles.finTotalValue}>{partnerNet.toLocaleString()} ₸</Text>
         </View>
       </View>
 
       {/* Client info */}
       {item.partnerClientName && (
-        <View style={pos.clientRow}>
-          <Text style={[pos.clientText, { color: colors.textMuted }]}>👤 {item.partnerClientName}</Text>
-          {item.partnerClientPhone && <Text style={[pos.clientText, { color: colors.textMuted }]}>📞 {item.partnerClientPhone}</Text>}
+        <View style={styles.clientRow}>
+          <Text style={[styles.clientText, { color: colors.textMuted }]}>👤 {item.partnerClientName}</Text>
+          {item.partnerClientPhone && <Text style={[styles.clientText, { color: colors.textMuted }]}>📞 {item.partnerClientPhone}</Text>}
         </View>
       )}
     </Pressable>
@@ -122,39 +122,39 @@ export default function PartnerOrdersScreen() {
         ListHeaderComponent={
           <>
             {/* Header */}
-            <View style={pos.listHeader}>
-              <Text style={[pos.listHeaderTitle, { color: colors.text }]}>Мои заказы</Text>
+            <View style={styles.listHeader}>
+              <Text style={[styles.listHeaderTitle, { color: colors.text }]}>Мои заказы</Text>
               <Pressable
                 // @ts-ignore
                 onPress={() => router.push('/partner/create-order')}
-                style={pos.createBtn}>
-                <Text style={pos.createBtnText}>+ Создать</Text>
+                style={styles.createBtn}>
+                <Text style={styles.createBtnText}>+ Создать</Text>
               </Pressable>
             </View>
 
             {/* Stats */}
-            <Animated.View entering={FadeInDown.delay(50).springify()} style={pos.statsRow}>
-              <View style={[s.card, pos.statCard]}>
-                <Text style={[pos.statValue, { color: '#FF6B35' }]}>{orders.length}</Text>
-                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Заказов</Text>
+            <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.statsRow}>
+              <View style={[s.card, styles.statCard]}>
+                <Text style={[styles.statValue, { color: '#FF6B35' }]}>{orders.length}</Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Заказов</Text>
               </View>
-              <View style={[s.card, pos.statCard]}>
-                <Text style={[pos.statValue, { color: '#22C55E' }]}>{totalEarned.toLocaleString()} ₸</Text>
-                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Получено</Text>
+              <View style={[s.card, styles.statCard]}>
+                <Text style={[styles.statValue, { color: '#22C55E' }]}>{totalEarned.toLocaleString()} ₸</Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Получено</Text>
               </View>
-              <View style={[s.card, pos.statCard]}>
-                <Text style={[pos.statValue, { color: '#F59E0B' }]}>{totalPending.toLocaleString()} ₸</Text>
-                <Text style={[pos.statLabel, { color: colors.textMuted }]}>Ожидается</Text>
+              <View style={[s.card, styles.statCard]}>
+                <Text style={[styles.statValue, { color: '#F59E0B' }]}>{totalPending.toLocaleString()} ₸</Text>
+                <Text style={[styles.statLabel, { color: colors.textMuted }]}>Ожидается</Text>
               </View>
             </Animated.View>
           </>
         }
         ListEmptyComponent={
           !isLoading ? (
-            <View style={pos.emptyWrap}>
-              <Text style={pos.emptyIcon}>🤝</Text>
-              <Text style={[pos.emptyTitle, s.textTitle]}>Нет заказов</Text>
-              <Text style={[pos.emptySubtitle, s.textMuted]}>Создайте первый заказ от клиента</Text>
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyIcon}>🤝</Text>
+              <Text style={[styles.emptyTitle, s.textTitle]}>Нет заказов</Text>
+              <Text style={[styles.emptySubtitle, s.textMuted]}>Создайте первый заказ от клиента</Text>
               <Pressable
                 // @ts-ignore
                 onPress={() => router.push('/partner/create-order')}
@@ -163,13 +163,13 @@ export default function PartnerOrdersScreen() {
               </Pressable>
             </View>
           ) : (
-            <View style={pos.emptyWrap}>
+            <View style={styles.emptyWrap}>
               <ActivityIndicator size="large" color="#FF6B35" />
             </View>
           )
         }
         renderItem={({ item, index }) => (
-          <Animated.View entering={FadeInDown.delay(index * 60).springify()} style={pos.cardItem}>
+          <Animated.View entering={FadeInDown.delay(index * 60).springify()} style={styles.cardItem}>
             <PartnerOrderCard item={item} onPress={() => router.push(`/order/${item.id}`)} />
           </Animated.View>
         )}

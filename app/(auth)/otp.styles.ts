@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: { paddingHorizontal: s(24), paddingTop: vs(64) },
   backBtn: { marginBottom: vs(32) },
   backText: { color: '#FF6B35', fontSize: s(16) },
@@ -57,3 +57,5 @@ export const styles = StyleSheet.create({
   resendText: { color: '#FF6B35', fontWeight: '500', fontSize: s(14) },
   pressed: { opacity: 0.6 }
 })
+
+export default styles

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const searchStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── Search bar ────────────────────────────────────────────
   searchBarWrap: {
     paddingHorizontal: s(20),
@@ -93,3 +93,5 @@ export const searchStyles = StyleSheet.create({
   },
   errorBtnText: { color: '#fff', fontWeight: '600', fontSize: s(14) }
 })
+
+export default styles

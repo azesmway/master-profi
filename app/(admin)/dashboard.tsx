@@ -2,6 +2,8 @@ import { StyleSheet, Text, View } from 'react-native'
 
 import { useTheme } from '@/hooks/useTheme'
 
+import styles from './dashboard.styles'
+
 export default function AdminDashboard() {
   const { colors } = useTheme()
   return (
@@ -10,8 +12,3 @@ export default function AdminDashboard() {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 20, fontWeight: '700' }
-})

@@ -7,7 +7,7 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
 import { APP_NAME } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 
-import { styles } from './welcome.styles'
+import styles from './welcome.styles'
 
 const FEATURES = [
   { icon: '🤖', text: 'AI подберёт лучших специалистов по описанию задачи' },
@@ -51,7 +51,7 @@ export default function WelcomeScreen() {
           </Pressable>
 
           <Pressable onPress={() => router.push('/(auth)/phone')} style={({ pressed }) => [styles.btnOutline, { borderColor: colors.border }, pressed && styles.pressed]}>
-            <Text style={[styles.btnOutlineText, { color: colors.text }]}>Я специалист — предлагать услуги</Text>
+            <Text style={[styles.btnOutlineText, { color: colors.text }]}>Я - специалист</Text>
           </Pressable>
 
           <Text style={[styles.terms, { color: colors.textMuted }]}>

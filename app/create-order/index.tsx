@@ -4,10 +4,10 @@ import { useMutation } from '@tanstack/react-query'
 import * as ImagePicker from 'expo-image-picker'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
-import { Image } from 'react-native'
+import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { PromoCodeInput } from '@/components/ui/PromoCodeInput'
 import VoiceInputButton from '@/components/ui/VoiceInputButton'
@@ -15,6 +15,9 @@ import { CATEGORIES, CURRENCIES, KZ_CITIES } from '@/constants'
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { useTheme } from '@/hooks/useTheme'
 import { ordersService } from '@/services/ordersService'
+import { makeStyles } from '@/utils/makeStyles'
+
+import styles from './index.styles'
 
 const WHISPER_URL = process.env.EXPO_PUBLIC_WHISPER_URL ?? 'https://api.it-trend.dev/whisper'
 
@@ -34,6 +37,7 @@ export default function CreateOrderScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { colors } = useTheme()
+  const s = makeStyles(colors)
 
   const [form, setForm] = useState<OrderForm>({
     title: '',
@@ -104,12 +108,8 @@ export default function CreateOrderScreen() {
         barterClientOffer: form.orderType === 'barter' ? form.barterOffer : undefined,
         budgetFrom: form.orderType !== 'barter' && form.budget ? parseInt(form.budget) : undefined
       }),
-    onSuccess: () => {
-      router.replace('/(client)/orders')
-    },
-    onError: (err: any) => {
-      console.error('[CreateOrder]', err?.response?.data ?? err.message)
-    }
+    onSuccess: () => router.replace('/(client)/orders'),
+    onError: (err: any) => console.error('[CreateOrder]', err?.response?.data ?? err.message)
   })
 
   const handleSubmit = () => {
@@ -117,139 +117,124 @@ export default function CreateOrderScreen() {
     mutation.mutate()
   }
 
-  const selectedCategory = CATEGORIES.find(c => c.id === form.categoryId)
-
   return (
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         {/* Header */}
-        <View className="px-5 pt-4 pb-4 flex-row items-center gap-3">
-          <Pressable onPress={() => (step > 1 ? setStep(s => (s - 1) as 1 | 2 | 3) : router.back())}>
-            <Text className="text-primary text-base">←</Text>
+        <View style={styles.header}>
+          <Pressable onPress={() => (step > 1 ? setStep(ss => (ss - 1) as 1 | 2 | 3) : router.back())}>
+            <Text style={styles.backBtn}>←</Text>
           </Pressable>
-          <Text className="text-dark dark:text-white text-lg font-bold flex-1">Новый заказ</Text>
-          <Text className="text-text-muted dark:text-text-secondary text-sm">{step}/3</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Новый заказ</Text>
+          <Text style={[styles.headerStep, { color: colors.textSecondary }]}>{step}/3</Text>
         </View>
 
         {/* Progress bar */}
-        <View className="px-5 mb-5">
-          <View className="h-1 bg-dark-border rounded-full overflow-hidden">
-            <View className="h-full bg-primary rounded-full transition-all" style={{ width: `${(step / 3) * 100}%` }} />
+        <View style={styles.progressWrap}>
+          <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+            <View style={[styles.progressFill, { width: `${(step / 3) * 100}%` as any }]} />
           </View>
         </View>
 
-        <ScrollView className="flex-1 px-5" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          {/* Step 1: What & Where */}
+        <ScrollView style={{ flex: 1, paddingHorizontal: sm(20) }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {/* ── Step 1 ── */}
           {step === 1 && (
-            <Animated.View entering={FadeInDown.springify()} className="gap-5">
-              <Text className="text-dark dark:text-white text-2xl font-bold">Что нужно сделать?</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Что нужно сделать?</Text>
 
+              {/* Order type */}
               <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Тип заказа</Text>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Тип заказа</Text>
+                <View style={styles.typeRow}>
                   <Pressable
                     onPress={() => update('orderType', 'standard')}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 12,
-                      borderRadius: 14,
-                      borderWidth: 2,
-                      alignItems: 'center',
-                      gap: 4,
-                      backgroundColor: form.orderType === 'standard' ? '#FF6B3515' : colors.card,
-                      borderColor: form.orderType === 'standard' ? '#FF6B35' : colors.border
-                    }}>
-                    <Text style={{ fontSize: 20 }}>💰</Text>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: form.orderType === 'standard' ? '#FF6B35' : colors.textMuted }}>Обычный</Text>
-                    <Text style={{ fontSize: 10, color: colors.textMuted, textAlign: 'center' }}>С оплатой</Text>
+                    style={[
+                      styles.typeBtn,
+                      {
+                        backgroundColor: form.orderType === 'standard' ? '#FF6B3515' : colors.card,
+                        borderColor: form.orderType === 'standard' ? '#FF6B35' : colors.border
+                      }
+                    ]}>
+                    <Text style={styles.typeBtnIcon}>💰</Text>
+                    <Text style={[styles.typeBtnLabel, { color: form.orderType === 'standard' ? '#FF6B35' : colors.textMuted }]}>Обычный</Text>
+                    <Text style={[styles.typeBtnSub, { color: colors.textMuted }]}>С оплатой</Text>
                   </Pressable>
                   <Pressable
                     onPress={() => update('orderType', 'barter')}
-                    style={{
-                      flex: 1,
-                      paddingVertical: 12,
-                      borderRadius: 14,
-                      borderWidth: 2,
-                      alignItems: 'center',
-                      gap: 4,
-                      backgroundColor: form.orderType === 'barter' ? '#8B5CF615' : colors.card,
-                      borderColor: form.orderType === 'barter' ? '#8B5CF6' : colors.border
-                    }}>
-                    <Text style={{ fontSize: 20 }}>🔄</Text>
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: form.orderType === 'barter' ? '#8B5CF6' : colors.textMuted }}>Бартер</Text>
-                    <Text style={{ fontSize: 10, color: colors.textMuted, textAlign: 'center' }}>Обмен</Text>
+                    style={[
+                      styles.typeBtn,
+                      {
+                        backgroundColor: form.orderType === 'barter' ? '#8B5CF615' : colors.card,
+                        borderColor: form.orderType === 'barter' ? '#8B5CF6' : colors.border
+                      }
+                    ]}>
+                    <Text style={styles.typeBtnIcon}>🔄</Text>
+                    <Text style={[styles.typeBtnLabel, { color: form.orderType === 'barter' ? '#8B5CF6' : colors.textMuted }]}>Бартер</Text>
+                    <Text style={[styles.typeBtnSub, { color: colors.textMuted }]}>Обмен</Text>
                   </Pressable>
                 </View>
               </View>
 
               {/* Category */}
               <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Категория *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Категория *</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View className="flex-row gap-2">
-                    {CATEGORIES.slice(0, 11).map(cat => (
-                      <Pressable
-                        key={cat.id}
-                        onPress={() => update('categoryId', cat.id)}
-                        className={[
-                          'items-center px-4 py-3 rounded-xl border min-w-16',
-                          form.categoryId === cat.id ? 'bg-primary/10 border-primary' : 'bg-light-card dark:bg-dark-card border-light-border dark:border-dark-border'
-                        ].join(' ')}>
-                        <Text className="text-xl mb-1">{cat.icon}</Text>
-                        <Text className={['text-xs text-center', form.categoryId === cat.id ? 'text-primary' : 'text-text-muted dark:text-text-secondary'].join(' ')} numberOfLines={2}>
-                          {cat.name.split(' ')[0]}
-                        </Text>
-                      </Pressable>
-                    ))}
+                  <View style={{ flexDirection: 'row', gap: sm(8) }}>
+                    {CATEGORIES.slice(0, 11).map(cat => {
+                      const active = form.categoryId === cat.id
+                      return (
+                        <Pressable
+                          key={cat.id}
+                          onPress={() => update('categoryId', cat.id)}
+                          style={[
+                            styles.catChip,
+                            {
+                              backgroundColor: active ? '#FF6B3515' : colors.card,
+                              borderColor: active ? '#FF6B35' : colors.border
+                            }
+                          ]}>
+                          <Text style={styles.catChipIcon}>{cat.icon}</Text>
+                          <Text style={[styles.catChipText, { color: active ? '#FF6B35' : colors.textSecondary }]} numberOfLines={2}>
+                            {cat.name.split(' ')[0]}
+                          </Text>
+                        </Pressable>
+                      )
+                    })}
                   </View>
                 </ScrollView>
-                {errors.categoryId && <Text className="text-error text-xs mt-1 ml-1">{errors.categoryId}</Text>}
+                {errors.categoryId && <Text style={styles.errorText}>{errors.categoryId}</Text>}
               </View>
 
               {/* Title */}
               <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Название *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Название *</Text>
                 <TextInput
                   value={form.title}
                   onChangeText={t => update('title', t)}
                   placeholder="Например: Починить кран на кухне"
                   placeholderTextColor={colors.textMuted}
-                  style={{
-                    backgroundColor: colors.card,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderRadius: 16,
-                    paddingHorizontal: 16,
-                    paddingVertical: 14,
-                    color: colors.text,
-                    fontSize: 14,
-                    outlineStyle: 'none'
-                  }}
+                  style={[s.input, { outlineStyle: 'none' } as any]}
                 />
-                {errors.title && <Text className="text-error text-xs mt-1 ml-1">{errors.title}</Text>}
+                {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
               </View>
 
-              {/* Description + Voice input */}
+              {/* Description + voice */}
               <View>
-                {/* Заголовок + кнопка микрофона — только когда idle */}
                 {recorder.state === 'idle' && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, marginLeft: 4 }}>
-                    <Text style={{ color: colors.textMuted, fontSize: 13 }}>Описание *</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                      <Text style={{ fontSize: 11, color: colors.textMuted }}>или надиктуйте</Text>
+                  <View style={styles.descLabelRow}>
+                    <Text style={[styles.fieldLabel, { color: colors.textSecondary, marginBottom: 0 }]}>Описание *</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: sm(6) }}>
+                      <Text style={{ color: colors.textMuted, fontSize: sm(11) }}>или надиктуйте</Text>
                       <VoiceInputButton state={recorder.state} duration={recorder.duration} onStart={recorder.start} onStop={recorder.stop} onCancel={recorder.cancel} />
                     </View>
                   </View>
                 )}
-
-                {/* Развёрнутый блок записи — только когда активна запись/обработка */}
                 {recorder.state !== 'idle' && (
-                  <View style={{ marginBottom: 12 }}>
-                    <Text style={{ color: colors.textMuted, fontSize: 13, marginBottom: 8, marginLeft: 4 }}>Описание *</Text>
+                  <View style={{ marginBottom: vs(12) }}>
+                    <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Описание *</Text>
                     <VoiceInputButton state={recorder.state} duration={recorder.duration} onStart={recorder.start} onStop={recorder.stop} onCancel={recorder.cancel} />
                   </View>
                 )}
-
                 <TextInput
                   value={form.description}
                   onChangeText={t => update('description', t)}
@@ -258,52 +243,39 @@ export default function CreateOrderScreen() {
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
-                  style={{
-                    minHeight: 100,
-                    backgroundColor: colors.card,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderRadius: 16,
-                    paddingHorizontal: 16,
-                    paddingVertical: 14,
-                    color: colors.text,
-                    fontSize: 14,
-                    outlineStyle: 'none'
-                  }}
+                  style={[s.input, { minHeight: vs(100), outlineStyle: 'none' } as any]}
                 />
-                {errors.description && <Text className="text-error text-xs mt-1 ml-1">{errors.description}</Text>}
+                {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
               </View>
 
-              <Pressable onPress={() => validateStep1() && setStep(2)} className="bg-primary py-4 rounded-2xl items-center mb-8 active:opacity-80">
-                <Text className="text-dark dark:text-white font-bold text-base">Далее →</Text>
+              <Pressable onPress={() => validateStep1() && setStep(2)} style={styles.nextBtn}>
+                <Text style={styles.nextBtnText}>Далее →</Text>
               </Pressable>
             </Animated.View>
           )}
 
-          {/* Step 2: Budget & Location */}
+          {/* ── Step 2 ── */}
           {step === 2 && (
-            <Animated.View entering={FadeInDown.springify()} className="gap-5">
-              <Text className="text-dark dark:text-white text-2xl font-bold">Бюджет/Бартер и место</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Бюджет/Бартер и место</Text>
 
               {/* Budget */}
               {form.orderType !== 'barter' && (
                 <View>
-                  <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Бюджет (необязательно)</Text>
-                  <View className="flex-row gap-2">
-                    <View className="flex-1 flex-row items-center bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl overflow-hidden">
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Бюджет (необязательно)</Text>
+                  <View style={styles.budgetRow}>
+                    <View style={[styles.budgetInputWrap, { backgroundColor: colors.card, borderColor: colors.border }]}>
                       <TextInput
                         value={form.budget}
                         onChangeText={t => update('budget', t.replace(/\D/g, ''))}
                         placeholder="10 000"
                         placeholderTextColor={colors.textMuted}
                         keyboardType="number-pad"
-                        style={{ flex: 1, color: colors.text, paddingHorizontal: 16, paddingVertical: 14, fontSize: 14, outlineStyle: 'none' }}
+                        style={[styles.budgetInput, { color: colors.text, outlineStyle: 'none' } as any]}
                       />
                     </View>
-                    <Pressable
-                      onPress={() => update('currency', form.currency === 'KZT' ? 'RUB' : 'KZT')}
-                      className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 justify-center">
-                      <Text className="text-dark dark:text-white font-medium">{CURRENCIES[form.currency].symbol}</Text>
+                    <Pressable onPress={() => update('currency', form.currency === 'KZT' ? 'RUB' : 'KZT')} style={[styles.currencyBtn, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                      <Text style={[styles.currencyText, { color: colors.text }]}>{CURRENCIES[form.currency].symbol}</Text>
                     </Pressable>
                   </View>
                 </View>
@@ -311,15 +283,13 @@ export default function CreateOrderScreen() {
 
               {/* City */}
               <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Город *</Text>
-                <Pressable
-                  onPress={() => setCityOpen(!cityOpen)}
-                  className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl px-4 py-4 flex-row justify-between">
-                  <Text className="text-dark dark:text-white text-sm">{form.city}</Text>
-                  <Text className="text-text-muted dark:text-text-secondary">{cityOpen ? '▲' : '▼'}</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Город *</Text>
+                <Pressable onPress={() => setCityOpen(!cityOpen)} style={[styles.cityPicker, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                  <Text style={[styles.cityPickerText, { color: colors.text }]}>{form.city}</Text>
+                  <Text style={[styles.cityPickerArrow, { color: colors.textMuted }]}>{cityOpen ? '▲' : '▼'}</Text>
                 </Pressable>
                 {cityOpen && (
-                  <View className="bg-light-elevated dark:bg-dark-elevated border border-light-border dark:border-dark-border rounded-2xl mt-2 max-h-48 overflow-hidden">
+                  <View style={[styles.cityDropdown, { backgroundColor: colors.elevated, borderColor: colors.border }]}>
                     <ScrollView>
                       {KZ_CITIES.map(c => (
                         <Pressable
@@ -328,8 +298,8 @@ export default function CreateOrderScreen() {
                             update('city', c)
                             setCityOpen(false)
                           }}
-                          className={['px-4 py-3 border-b border-light-border dark:border-dark-border', c === form.city ? 'bg-primary/10' : ''].join(' ')}>
-                          <Text className={c === form.city ? 'text-primary font-medium' : 'text-dark dark:text-white text-sm'}>{c}</Text>
+                          style={[styles.cityOption, { borderBottomColor: colors.border, backgroundColor: c === form.city ? '#FF6B3510' : 'transparent' }]}>
+                          <Text style={[styles.cityOptionText, { color: c === form.city ? '#FF6B35' : colors.text, fontWeight: c === form.city ? '500' : '400' }]}>{c}</Text>
                         </Pressable>
                       ))}
                     </ScrollView>
@@ -337,24 +307,24 @@ export default function CreateOrderScreen() {
                 )}
               </View>
 
-              <Pressable onPress={() => setStep(3)} className="bg-primary py-4 rounded-2xl items-center mb-8 active:opacity-80">
-                <Text className="text-dark dark:text-white font-bold text-base">Далее →</Text>
+              <Pressable onPress={() => setStep(3)} style={styles.nextBtn}>
+                <Text style={styles.nextBtnText}>Далее →</Text>
               </Pressable>
             </Animated.View>
           )}
 
-          {/* Step 3: Photos & Review */}
+          {/* ── Step 3 ── */}
           {step === 3 && (
-            <Animated.View entering={FadeInDown.springify()} className="gap-5">
-              <Text className="text-dark dark:text-white text-2xl font-bold">Фото и публикация</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Фото и публикация</Text>
 
               {/* Photos */}
               <View>
-                <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Фото (необязательно, до 5 шт.)</Text>
-                <View className="flex-row flex-wrap gap-3">
+                <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Фото (необязательно, до 5 шт.)</Text>
+                <View style={styles.photoGrid}>
                   {form.photos.map((uri, i) => (
-                    <View key={i} className="relative">
-                      <Image source={{ uri }} style={{ width: 80, height: 80, borderRadius: 12 }} resizeMode="cover" />
+                    <View key={i} style={styles.photoWrap}>
+                      <Image source={{ uri }} style={styles.photoImg} resizeMode="cover" />
                       <Pressable
                         onPress={() =>
                           update(
@@ -362,57 +332,24 @@ export default function CreateOrderScreen() {
                             form.photos.filter((_, j) => j !== i)
                           )
                         }
-                        className="absolute -top-2 -right-2 w-5 h-5 bg-error rounded-full items-center justify-center">
-                        <Text className="text-dark dark:text-white text-xs font-bold">✕</Text>
+                        style={styles.photoDeleteBtn}>
+                        <Text style={styles.photoDeleteText}>✕</Text>
                       </Pressable>
                     </View>
                   ))}
                   {form.photos.length < 5 && (
-                    <Pressable onPress={pickImages} className="w-20 h-20 rounded-xl border-2 border-dashed border-light-border dark:border-dark-border items-center justify-center active:opacity-70">
-                      <Text className="text-2xl text-text-muted dark:text-text-secondary">+</Text>
+                    <Pressable onPress={pickImages} style={[styles.photoAddBtn, { borderColor: colors.border }]}>
+                      <Text style={[styles.photoAddIcon, { color: colors.textMuted }]}>📷</Text>
+                      <Text style={[styles.photoAddText, { color: colors.textMuted }]}>Добавить</Text>
                     </Pressable>
                   )}
                 </View>
               </View>
 
-              {/* Review summary */}
-              <View className="bg-light-card dark:bg-dark-card border border-light-border dark:border-dark-border rounded-2xl p-4 gap-3">
-                <Text className="text-dark dark:text-white font-semibold">Итог заказа</Text>
-                {selectedCategory && (
-                  <View className="flex-row items-center gap-2">
-                    <Text>{selectedCategory.icon}</Text>
-                    <Text className="text-text-muted dark:text-text-secondary text-sm">{selectedCategory.name}</Text>
-                  </View>
-                )}
-                <Text className="text-dark dark:text-white text-sm font-medium">{form.title}</Text>
-                {form.description && (
-                  <Text className="text-text-muted dark:text-text-secondary text-sm" numberOfLines={3}>
-                    {form.description}
-                  </Text>
-                )}
-                {form.budget && (
-                  <Text className="text-dark dark:text-white text-sm">
-                    Бюджет: {parseInt(form.budget).toLocaleString()} {CURRENCIES[form.currency].symbol}
-                  </Text>
-                )}
-                <Text className="text-text-muted dark:text-text-secondary text-sm">📍 {form.city}</Text>
-              </View>
-
+              {/* Barter offer */}
               {form.orderType === 'barter' && (
                 <Animated.View entering={FadeInDown.springify()}>
-                  <View
-                    style={{
-                      backgroundColor: '#8B5CF615',
-                      borderRadius: 16,
-                      padding: 16,
-                      borderWidth: 1,
-                      borderColor: '#8B5CF630',
-                      marginBottom: 16
-                    }}>
-                    <Text style={{ color: '#8B5CF6', fontWeight: '700', marginBottom: 4 }}>🔄 Бартер-заказ</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 13, lineHeight: 18 }}>Опишите что вы готовы предложить мастеру взамен его услуг</Text>
-                  </View>
-                  <Text className="text-text-muted dark:text-text-secondary text-sm mb-2 ml-1">Что предлагаете мастеру взамен? *</Text>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>Что предлагаете мастеру взамен? *</Text>
                   <TextInput
                     value={form.barterOffer}
                     onChangeText={t => update('barterOffer', t)}
@@ -420,19 +357,7 @@ export default function CreateOrderScreen() {
                     placeholderTextColor={colors.textMuted}
                     multiline
                     numberOfLines={4}
-                    style={{
-                      minHeight: 110,
-                      backgroundColor: colors.card,
-                      borderWidth: 1.5,
-                      borderColor: '#8B5CF640',
-                      borderRadius: 16,
-                      paddingHorizontal: 16,
-                      paddingVertical: 14,
-                      color: colors.text,
-                      fontSize: 14,
-                      textAlignVertical: 'top',
-                      outlineStyle: 'none'
-                    }}
+                    style={[styles.barterInput, { backgroundColor: colors.card, color: colors.text, outlineStyle: 'none' } as any]}
                   />
                 </Animated.View>
               )}
@@ -440,8 +365,8 @@ export default function CreateOrderScreen() {
               {/* Promo code */}
               <PromoCodeInput onApplied={promo => setAppliedPromo(promo)} onRemoved={() => setAppliedPromo(null)} />
 
-              <Pressable onPress={handleSubmit} disabled={mutation.isPending} className="bg-primary py-4 rounded-2xl items-center mb-8 active:opacity-80 disabled:opacity-50">
-                {mutation.isPending ? <ActivityIndicator color="white" /> : <Text className="text-dark dark:text-white font-bold text-base">Опубликовать заказ 🚀</Text>}
+              <Pressable onPress={handleSubmit} disabled={mutation.isPending} style={[styles.submitBtn, { opacity: mutation.isPending ? 0.5 : 1 }]}>
+                {mutation.isPending ? <ActivityIndicator color="white" /> : <Text style={styles.submitBtnText}>Опубликовать заказ 🚀</Text>}
               </Pressable>
             </Animated.View>
           )}

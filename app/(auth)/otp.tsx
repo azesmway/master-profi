@@ -10,7 +10,7 @@ import { getApiError } from '@/services/api'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/store/authStore'
 
-import { styles } from './otp.styles'
+import styles from './otp.styles'
 
 const CODE_LENGTH = 6
 const RESEND_SECONDS = 60

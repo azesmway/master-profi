@@ -16,7 +16,7 @@ import { getDistance } from '@/hooks/usePWA'
 import { useTheme } from '@/hooks/useTheme'
 import type { Order } from '@/types'
 
-import { ordersStyles as os } from './orders.styles'
+import styles from './orders.styles'
 
 // ─── Order Card ──────────────────────────────────────────────────────────────
 
@@ -28,39 +28,39 @@ function OrderCard({ order, onPress }: { order: Order; onPress: () => void }) {
   const unitLabel = budget?.unit === 'hour' ? '/час' : budget?.unit === 'day' ? '/день' : ''
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [os.card, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}>
       {/* Top row: category + time */}
-      <View style={os.cardTopRow}>
-        <View style={os.cardCatRow}>
-          <Text style={os.cardCatIcon}>{category?.icon ?? '🔑'}</Text>
-          <Text style={[os.cardCatName, { color: colors.textSecondary }]}>{category?.name ?? 'Без названия'}</Text>
+      <View style={styles.cardTopRow}>
+        <View style={styles.cardCatRow}>
+          <Text style={styles.cardCatIcon}>{category?.icon ?? '🔑'}</Text>
+          <Text style={[styles.cardCatName, { color: colors.textSecondary }]}>{category?.name ?? 'Без названия'}</Text>
         </View>
-        <Text style={[os.cardTime, { color: colors.textSecondary }]}>{timeAgo}</Text>
+        <Text style={[styles.cardTime, { color: colors.textSecondary }]}>{timeAgo}</Text>
       </View>
 
       {/* Title */}
-      <Text style={[os.cardTitle, { color: colors.text }]}>{title}</Text>
+      <Text style={[styles.cardTitle, { color: colors.text }]}>{title}</Text>
 
       {/* Description */}
-      <Text style={[os.cardDesc, { color: colors.textSecondary }]} numberOfLines={2}>
+      <Text style={[styles.cardDesc, { color: colors.textSecondary }]} numberOfLines={2}>
         {description}
       </Text>
 
       {/* Footer */}
-      <View style={os.cardFooter}>
-        <View style={os.cardFooterLeft}>
-          <Text style={[os.cardCity, { color: colors.textSecondary }]}>📍 {location?.city ?? '- Нет -'}</Text>
+      <View style={styles.cardFooter}>
+        <View style={styles.cardFooterLeft}>
+          <Text style={[styles.cardCity, { color: colors.textSecondary }]}>📍 {location?.city ?? '- Нет -'}</Text>
           {responseCount > 0 && (
-            <View style={os.cardResponseBadge}>
-              <Text style={os.cardResponseText}>{responseCount} откликов</Text>
+            <View style={styles.cardResponseBadge}>
+              <Text style={styles.cardResponseText}>{responseCount} откликов</Text>
             </View>
           )}
         </View>
         {budget && (
-          <Text style={[os.cardBudget, { color: colors.text }]}>
+          <Text style={[styles.cardBudget, { color: colors.text }]}>
             {budget.from.toLocaleString()}–{budget.to?.toLocaleString() ?? '?'}
             {currency}
-            <Text style={os.cardBudgetUnit}>{unitLabel}</Text>
+            <Text style={styles.cardBudgetUnit}>{unitLabel}</Text>
           </Text>
         )}
       </View>
@@ -103,16 +103,16 @@ export default function SpecialistOrdersScreen() {
   return (
     <Screen>
       {/* Header */}
-      <View style={os.header}>
-        <Text style={[os.headerTitle, { color: colors.text }]}>Лента заказов</Text>
-        <View style={os.onlineRow}>
-          <View style={os.onlineDot} />
-          <Text style={os.onlineText}>Вы онлайн</Text>
+      <View style={styles.header}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Лента заказов</Text>
+        <View style={styles.onlineRow}>
+          <View style={styles.onlineDot} />
+          <Text style={styles.onlineText}>Вы онлайн</Text>
         </View>
       </View>
 
       {/* Category filter */}
-      <View style={os.filterWrap}>
+      <View style={styles.filterWrap}>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -125,14 +125,14 @@ export default function SpecialistOrdersScreen() {
               <Pressable
                 onPress={() => setActiveCat(item.id ?? null)}
                 style={[
-                  os.catChip,
+                  styles.catChip,
                   {
                     backgroundColor: isActive ? '#FF6B35' : colors.card,
                     borderColor: isActive ? '#FF6B35' : colors.border
                   }
                 ]}>
-                {item.icon && <Text style={os.catChipIcon}>{item.icon}</Text>}
-                <Text style={[os.catChipText, { color: isActive ? '#fff' : colors.textSecondary }]}>{item.name}</Text>
+                {item.icon && <Text style={styles.catChipIcon}>{item.icon}</Text>}
+                <Text style={[styles.catChipText, { color: isActive ? '#fff' : colors.textSecondary }]}>{item.name}</Text>
               </Pressable>
             )
           }}
@@ -155,12 +155,12 @@ export default function SpecialistOrdersScreen() {
             tintColor="#FF6B35"
           />
         }
-        ListHeaderComponent={<Text style={[os.listHeader, { color: colors.textSecondary }]}>{sorted.length} заказов в вашем городе</Text>}
+        ListHeaderComponent={<Text style={[styles.listHeader, { color: colors.textSecondary }]}>{sorted.length} заказов в вашем городе</Text>}
         ListEmptyComponent={
-          <View style={os.emptyWrap}>
-            <Text style={os.emptyIcon}>📭</Text>
-            <Text style={[os.emptyTitle, { color: colors.text }]}>Нет заказов</Text>
-            <Text style={[os.emptySubtitle, { color: colors.textSecondary }]}>В этой категории пока нет активных заказов</Text>
+          <View style={styles.emptyWrap}>
+            <Text style={styles.emptyIcon}>📭</Text>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>Нет заказов</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>В этой категории пока нет активных заказов</Text>
           </View>
         }
         renderItem={({ item, index }) => (

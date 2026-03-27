@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react'
-import { View, type ViewStyle } from 'react-native'
+import { isMobile } from 'react-device-detect'
+import { Dimensions, View, type ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useTheme } from '@/hooks/useTheme'
+
+const { width } = Dimensions.get('window')
 
 interface ScreenProps {
   children: ReactNode
@@ -25,6 +28,8 @@ export default function Screen({ children, style, safeTop = true, safeBottom = f
       style={[
         {
           flex: 1,
+          width: isMobile ? width : width / 2,
+          alignSelf: isMobile ? undefined : 'center',
           backgroundColor: colors.bg,
           paddingTop: safeTop ? insets.top : 0,
           paddingBottom: safeBottom ? insets.bottom : 0

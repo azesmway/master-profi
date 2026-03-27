@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const ordersStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────
   header: {
     paddingHorizontal: s(20),
@@ -80,3 +80,5 @@ export const ordersStyles = StyleSheet.create({
   cardBudget: { fontSize: s(14), fontWeight: '600' },
   cardBudgetUnit: { fontSize: s(12), fontWeight: '400' }
 })
+
+export default styles

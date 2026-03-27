@@ -1,13 +1,16 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { useQuery } from '@tanstack/react-query'
 import { Tabs } from 'expo-router'
-import { Pressable, Text, View } from 'react-native'
+import {Dimensions, Pressable, Text, View} from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { QUERY_KEYS } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 import { chatService } from '@/services/chatService'
 import { makeStyles } from '@/utils/makeStyles'
+import { isMobile } from "react-device-detect";
+
+const { width } = Dimensions.get('window')
 
 const TAB_ICONS: Record<string, string> = {
   home: '🏠',
@@ -39,7 +42,7 @@ function ClientTabBar({ state, navigation }: BottomTabBarProps) {
   const unreadCount = (rooms ?? []).reduce((sum: number, r: any) => sum + (r.unreadCount ?? 0), 0)
 
   return (
-    <View style={[makeStyles(colors).tabBar, { paddingBottom: insets.bottom + 4 }]}>
+    <View style={[makeStyles(colors).tabBar, { paddingBottom: insets.bottom + 4, width: isMobile ? width : width / 2.3, alignSelf: isMobile ? undefined : 'center' }]}>
       {visibleRoutes.map(route => {
         const isFocused = state.routes[state.index]?.name === route.name
         const icon = TAB_ICONS[route.name] ?? '●'

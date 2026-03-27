@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   screen: { padding: s(20) },
   logoArea: {
     marginVertical: vs(20),
@@ -55,3 +55,5 @@ export const styles = StyleSheet.create({
   terms: { fontSize: s(12), textAlign: 'center', lineHeight: s(18), marginTop: 8 },
   link: { color: '#FF6B35' }
 })
+
+export default styles

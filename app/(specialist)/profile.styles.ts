@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const profileStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────
   header: {
     flexDirection: 'row',
@@ -170,3 +170,5 @@ export const profileStyles = StyleSheet.create({
     marginTop: vs(10)
   }
 })
+
+export default styles

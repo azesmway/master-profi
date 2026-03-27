@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
 import { s, vs } from 'react-native-size-matters'
 
-export const profileStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   pageHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -66,3 +66,5 @@ export const profileStyles = StyleSheet.create({
     fontWeight: '700' as const
   }
 })
+
+export default styles

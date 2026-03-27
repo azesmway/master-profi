@@ -4,12 +4,15 @@ import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
+import { s as sm, vs } from 'react-native-size-matters'
 
 import { CATEGORIES, KZ_CITIES } from '@/constants'
 import { useTheme } from '@/hooks/useTheme'
 import { ordersService } from '@/services/ordersService'
 import { useAuthStore } from '@/store/authStore'
 import { makeStyles } from '@/utils/makeStyles'
+
+import styles from './create-order.styles'
 
 const COMMISSION_OPTIONS = [5, 10, 15, 20, 25, 30]
 
@@ -79,7 +82,6 @@ export default function PartnerCreateOrderScreen() {
     }
   })
 
-  // ── Расчёт комиссий ───────────────────────────────────────
   const budget = form.budgetFrom ? parseInt(form.budgetFrom) : 0
   const partnerEarns = Math.floor((budget * form.commissionPercent) / 100)
   const platformCut = Math.floor(partnerEarns * 0.1)
@@ -89,110 +91,107 @@ export default function PartnerCreateOrderScreen() {
     <Screen>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         {/* Header */}
-        <View style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={styles.header}>
           <Pressable onPress={() => (step > 1 ? setStep(ss => (ss - 1) as any) : router.back())}>
-            <Text style={{ color: '#FF6B35', fontSize: 16 }}>←</Text>
+            <Text style={styles.backBtn}>←</Text>
           </Pressable>
-          <Text style={[s.textTitle, { flex: 1, fontSize: 18 }]}>Заказ от партнёра</Text>
-          <Text style={s.textMuted}>{step}/3</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Заказ от партнёра</Text>
+          <Text style={[styles.headerStep, { color: colors.textMuted }]}>{step}/3</Text>
         </View>
 
         {/* Progress */}
-        <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
-          <View style={{ height: 4, backgroundColor: colors.border, borderRadius: 2 }}>
-            <View style={{ height: 4, backgroundColor: '#FF6B35', borderRadius: 2, width: `${(step / 3) * 100}%` }} />
+        <View style={styles.progressWrap}>
+          <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+            <View style={[styles.progressFill, { width: `${(step / 3) * 100}%` as any }]} />
           </View>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: sm(20), paddingBottom: vs(32), gap: vs(20) }} keyboardShouldPersistTaps="handled">
           {/* ── Step 1: Задача ── */}
           {step === 1 && (
-            <Animated.View entering={FadeInDown.springify()} style={{ gap: 20 }}>
-              <Text style={[s.textTitle, { fontSize: 22 }]}>Что нужно сделать?</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Что нужно сделать?</Text>
 
               {/* Category */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Категория *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Категория *</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <View style={{ flexDirection: 'row', gap: sm(8) }}>
                     {CATEGORIES.slice(0, 11).map(cat => {
                       const active = form.categoryId === cat.id
                       return (
                         <Pressable
                           key={cat.id}
                           onPress={() => update('categoryId', cat.id)}
-                          style={{
-                            alignItems: 'center',
-                            paddingHorizontal: 14,
-                            paddingVertical: 10,
-                            borderRadius: 14,
-                            borderWidth: 1,
-                            backgroundColor: active ? '#FF6B3515' : colors.card,
-                            borderColor: active ? '#FF6B35' : colors.border
-                          }}>
-                          <Text style={{ fontSize: 20, marginBottom: 4 }}>{cat.icon}</Text>
-                          <Text style={{ fontSize: 10, color: active ? '#FF6B35' : colors.textMuted, textAlign: 'center' }}>{cat.name}</Text>
+                          style={[
+                            styles.catChip,
+                            {
+                              backgroundColor: active ? '#FF6B3515' : colors.card,
+                              borderColor: active ? '#FF6B35' : colors.border
+                            }
+                          ]}>
+                          <Text style={styles.catChipIcon}>{cat.icon}</Text>
+                          <Text style={[styles.catChipText, { color: active ? '#FF6B35' : colors.textMuted }]}>{cat.name}</Text>
                         </Pressable>
                       )
                     })}
                   </View>
                 </ScrollView>
-                {errors.categoryId && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.categoryId}</Text>}
+                {errors.categoryId && <Text style={styles.errorText}>{errors.categoryId}</Text>}
               </View>
 
               {/* Title */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Название заказа *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Название задачи *</Text>
                 <TextInput
                   value={form.title}
                   onChangeText={t => update('title', t)}
-                  placeholder="Например: Установка сантехники"
+                  placeholder="Например: Ремонт ванной комнаты"
                   placeholderTextColor={colors.textMuted}
-                  style={[s.input, { outlineStyle: 'none' }]}
+                  style={[s.input, { outlineStyle: 'none' } as any]}
                 />
-                {errors.title && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.title}</Text>}
+                {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
               </View>
 
               {/* Description */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Описание *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Описание задачи *</Text>
                 <TextInput
                   value={form.description}
                   onChangeText={t => update('description', t)}
-                  placeholder="Подробно опишите задачу..."
+                  placeholder="Опишите подробно что нужно сделать..."
                   placeholderTextColor={colors.textMuted}
                   multiline
                   numberOfLines={4}
-                  style={[s.input, { height: 100, textAlignVertical: 'top', paddingTop: 12, outlineStyle: 'none' }]}
+                  style={[s.input, { height: vs(100), textAlignVertical: 'top', paddingTop: vs(12), outlineStyle: 'none' } as any]}
                 />
-                {errors.description && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.description}</Text>}
+                {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
               </View>
 
               {/* City */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Город</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Город</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
-                    {KZ_CITIES.map(c => (
+                  <View style={{ flexDirection: 'row', gap: sm(8) }}>
+                    {KZ_CITIES.slice(0, 6).map(c => (
                       <Pressable
                         key={c}
                         onPress={() => update('city', c)}
-                        style={{
-                          paddingHorizontal: 14,
-                          paddingVertical: 8,
-                          borderRadius: 20,
-                          borderWidth: 1,
-                          backgroundColor: form.city === c ? '#FF6B35' : colors.card,
-                          borderColor: form.city === c ? '#FF6B35' : colors.border
-                        }}>
-                        <Text style={{ fontSize: 13, color: form.city === c ? '#fff' : colors.textMuted }}>{c}</Text>
+                        style={[
+                          styles.cityChip,
+                          {
+                            backgroundColor: form.city === c ? '#FF6B35' : colors.card,
+                            borderColor: form.city === c ? '#FF6B35' : colors.border
+                          }
+                        ]}>
+                        <Text style={[styles.cityChipText, { color: form.city === c ? '#fff' : colors.textMuted }]}>{c}</Text>
                       </Pressable>
                     ))}
                   </View>
                 </ScrollView>
               </View>
 
-              <Pressable onPress={() => validateStep1() && setStep(2)} style={s.buttonPrimary}>
+              <Pressable onPress={() => validateStep1() && setStep(2)} style={[s.buttonPrimary, styles.nextBtn]}>
                 <Text style={s.buttonText}>Далее →</Text>
               </Pressable>
             </Animated.View>
@@ -200,37 +199,48 @@ export default function PartnerCreateOrderScreen() {
 
           {/* ── Step 2: Бюджет и клиент ── */}
           {step === 2 && (
-            <Animated.View entering={FadeInDown.springify()} style={{ gap: 20 }}>
-              <Text style={[s.textTitle, { fontSize: 22 }]}>Бюджет и клиент</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Бюджет и клиент</Text>
 
-              {/* Budget */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Бюджет клиента (₸) *</Text>
-                <TextInput value={form.budgetFrom} onChangeText={t => update('budgetFrom', t)} placeholder="50000" placeholderTextColor={colors.textMuted} keyboardType="numeric" style={[s.input, { outlineStyle: 'none' }]} />
-                {errors.budgetFrom && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.budgetFrom}</Text>}
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Бюджет клиента (₸) *</Text>
+                <TextInput
+                  value={form.budgetFrom}
+                  onChangeText={t => update('budgetFrom', t)}
+                  placeholder="50000"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="numeric"
+                  style={[s.input, { outlineStyle: 'none' } as any]}
+                />
+                {errors.budgetFrom && <Text style={styles.errorText}>{errors.budgetFrom}</Text>}
               </View>
 
-              {/* Client info */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Имя клиента *</Text>
-                <TextInput value={form.clientName} onChangeText={t => update('clientName', t)} placeholder="Алия Иванова" placeholderTextColor={colors.textMuted} style={[s.input, { outlineStyle: 'none' }]} />
-                {errors.clientName && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.clientName}</Text>}
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Имя клиента *</Text>
+                <TextInput
+                  value={form.clientName}
+                  onChangeText={t => update('clientName', t)}
+                  placeholder="Алия Иванова"
+                  placeholderTextColor={colors.textMuted}
+                  style={[s.input, { outlineStyle: 'none' } as any]}
+                />
+                {errors.clientName && <Text style={styles.errorText}>{errors.clientName}</Text>}
               </View>
 
               <View>
-                <Text style={[s.textMuted, { marginBottom: 8 }]}>Телефон клиента *</Text>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Телефон клиента *</Text>
                 <TextInput
                   value={form.clientPhone}
                   onChangeText={t => update('clientPhone', t)}
                   placeholder="+7 700 000 0000"
                   placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
-                  style={[s.input, { outlineStyle: 'none' }]}
+                  style={[s.input, { outlineStyle: 'none' } as any]}
                 />
-                {errors.clientPhone && <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>{errors.clientPhone}</Text>}
+                {errors.clientPhone && <Text style={styles.errorText}>{errors.clientPhone}</Text>}
               </View>
 
-              <Pressable onPress={() => validateStep2() && setStep(3)} style={s.buttonPrimary}>
+              <Pressable onPress={() => validateStep2() && setStep(3)} style={[s.buttonPrimary, styles.nextBtn]}>
                 <Text style={s.buttonText}>Далее →</Text>
               </Pressable>
             </Animated.View>
@@ -238,30 +248,30 @@ export default function PartnerCreateOrderScreen() {
 
           {/* ── Step 3: Комиссия ── */}
           {step === 3 && (
-            <Animated.View entering={FadeInDown.springify()} style={{ gap: 20 }}>
-              <Text style={[s.textTitle, { fontSize: 22 }]}>Ваша комиссия</Text>
-              <Text style={[s.textSecondary, { lineHeight: 20 }]}>Выберите процент от суммы заказа, который вы хотите получить. Мы возьмём 10% от вашей комиссии.</Text>
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: vs(20) }}>
+              <Text style={[styles.stepTitle, { color: colors.text }]}>Ваша комиссия</Text>
+              <Text style={[styles.stepSubtitle, { color: colors.textSecondary }]}>Выберите процент от суммы заказа, который вы хотите получить. Мы возьмём 10% от вашей комиссии.</Text>
 
               {/* Commission selector */}
               <View>
-                <Text style={[s.textMuted, { marginBottom: 12 }]}>Ваша комиссия *</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>Ваша комиссия *</Text>
+                <View style={styles.commissionGrid}>
                   {COMMISSION_OPTIONS.map(pct => {
                     const active = form.commissionPercent === pct
+                    const net = Math.floor((budget * pct) / 100) - Math.floor(Math.floor((budget * pct) / 100) * 0.1)
                     return (
                       <Pressable
                         key={pct}
                         onPress={() => update('commissionPercent', pct)}
-                        style={{
-                          width: '30%',
-                          paddingVertical: 14,
-                          borderRadius: 14,
-                          borderWidth: 2,
-                          alignItems: 'center',
-                          backgroundColor: active ? '#FF6B35' : colors.card,
-                          borderColor: active ? '#FF6B35' : colors.border
-                        }}>
-                        <Text style={{ fontSize: 20, fontWeight: '800', color: active ? '#fff' : colors.text }}>{pct}%</Text>
+                        style={[
+                          styles.commissionBtn,
+                          {
+                            backgroundColor: active ? '#FF6B35' : colors.card,
+                            borderColor: active ? '#FF6B35' : colors.border
+                          }
+                        ]}>
+                        <Text style={[styles.commissionBtnValue, { color: active ? '#fff' : colors.text }]}>{pct}%</Text>
+                        {budget > 0 && <Text style={[styles.commissionBtnNet, { color: active ? 'rgba(255,255,255,0.8)' : colors.textMuted }]}>{net.toLocaleString()} ₸</Text>}
                       </Pressable>
                     )
                   })}
@@ -270,31 +280,29 @@ export default function PartnerCreateOrderScreen() {
 
               {/* Commission breakdown */}
               {budget > 0 && (
-                <Animated.View entering={FadeInDown.springify()} style={[s.card, { gap: 12 }]}>
-                  <Text style={s.textLabel}>Расчёт комиссии</Text>
-                  <View style={{ gap: 8 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={s.textSecondary}>Сумма заказа</Text>
-                      <Text style={s.textLabel}>{budget.toLocaleString()} ₸</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={s.textSecondary}>Ваша комиссия ({form.commissionPercent}%)</Text>
-                      <Text style={s.textLabel}>{partnerEarns.toLocaleString()} ₸</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={s.textSecondary}>Комиссия платформы (10%)</Text>
-                      <Text style={{ color: '#EF4444', fontWeight: '600' }}>− {platformCut.toLocaleString()} ₸</Text>
-                    </View>
-                    <View style={{ height: 1, backgroundColor: colors.border }} />
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                      <Text style={{ color: '#22C55E', fontWeight: '700' }}>Вы получите</Text>
-                      <Text style={{ color: '#22C55E', fontWeight: '800', fontSize: 18 }}>{partnerNet.toLocaleString()} ₸</Text>
-                    </View>
+                <Animated.View entering={FadeInDown.springify()} style={[s.card, styles.breakdownCard]}>
+                  <Text style={[s.textLabel, { color: colors.text }]}>Расчёт комиссии</Text>
+                  <View style={styles.breakdownRow}>
+                    <Text style={s.textSecondary}>Сумма заказа</Text>
+                    <Text style={s.textLabel}>{budget.toLocaleString()} ₸</Text>
+                  </View>
+                  <View style={styles.breakdownRow}>
+                    <Text style={s.textSecondary}>Ваша комиссия ({form.commissionPercent}%)</Text>
+                    <Text style={s.textLabel}>{partnerEarns.toLocaleString()} ₸</Text>
+                  </View>
+                  <View style={styles.breakdownRow}>
+                    <Text style={s.textSecondary}>Комиссия платформы (10%)</Text>
+                    <Text style={styles.breakdownCut}>− {platformCut.toLocaleString()} ₸</Text>
+                  </View>
+                  <View style={[styles.breakdownDivider, { backgroundColor: colors.border }]} />
+                  <View style={styles.breakdownRow}>
+                    <Text style={styles.breakdownTotalLabel}>Вы получите</Text>
+                    <Text style={styles.breakdownTotalValue}>{partnerNet.toLocaleString()} ₸</Text>
                   </View>
                 </Animated.View>
               )}
 
-              <Pressable onPress={() => mutation.mutate()} disabled={mutation.isPending} style={[s.buttonPrimary, { opacity: mutation.isPending ? 0.6 : 1 }]}>
+              <Pressable onPress={() => mutation.mutate()} disabled={mutation.isPending} style={[s.buttonPrimary, styles.submitBtn, { opacity: mutation.isPending ? 0.6 : 1 }]}>
                 {mutation.isPending ? <ActivityIndicator color="#fff" /> : <Text style={s.buttonText}>✓ Опубликовать заказ</Text>}
               </Pressable>
             </Animated.View>

@@ -1,9 +1,10 @@
+import Screen from '@components/ui/Screen'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Image } from 'expo-image'
 import * as ImagePicker from 'expo-image-picker'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Svg, { Path } from 'react-native-svg'
 
@@ -13,6 +14,8 @@ import { useTheme } from '@/hooks/useTheme'
 import { chatService } from '@/services/chatService'
 import { useAuthStore } from '@/store/authStore'
 import type { Message } from '@/types'
+
+import styles from './id.styles'
 
 const fmt = (iso: string) => new Date(iso).toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' })
 
@@ -52,36 +55,17 @@ function Bubble({ msg, isMe, showTail }: { msg: Message; isMe: boolean; showTail
   const timeColor = isMe ? 'rgba(255,255,255,0.65)' : isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)'
 
   return (
-    <View style={[s.row, isMe ? s.rowOut : s.rowIn]}>
+    <View style={[styles.row, isMe ? styles.rowOut : styles.rowIn]}>
       {!isMe && showTail && <TailIn color={IN_COLOR} />}
-      <View
-        style={[
-          s.bubble,
-          { backgroundColor: bg },
-          isMe
-            ? {
-                borderRadius: 18,
-                borderBottomRightRadius: showTail ? 4 : 18
-              }
-            : {
-                borderRadius: 18,
-                borderBottomLeftRadius: showTail ? 4 : 18
-              }
-        ]}>
-        {msg.type === 'image' && msg.mediaUrl ? <Image source={{ uri: msg.mediaUrl }} style={s.imgBubble} contentFit="cover" /> : <Text style={[s.msgText, { color: textColor }]}>{msg.content}</Text>}
-        <View style={s.meta}>
-          <Text style={[s.time, { color: timeColor }]}>{fmt(msg.createdAt)}</Text>
-          {isMe && (
-            <Text
-              style={[
-                s.ticks,
-                {
-                  color: msg.isRead ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)'
-                }
-              ]}>
-              {msg.isRead ? ' ✓✓' : ' ✓'}
-            </Text>
-          )}
+      <View style={[styles.bubble, { backgroundColor: bg }, isMe ? { borderRadius: 18, borderBottomRightRadius: showTail ? 4 : 18 } : { borderRadius: 18, borderBottomLeftRadius: showTail ? 4 : 18 }]}>
+        {msg.type === 'image' && msg.mediaUrl ? (
+          <Image source={{ uri: msg.mediaUrl }} style={styles.imgBubble} contentFit="cover" />
+        ) : (
+          <Text style={[styles.msgText, { color: textColor }]}>{msg.content}</Text>
+        )}
+        <View style={styles.meta}>
+          <Text style={[styles.time, { color: timeColor }]}>{fmt(msg.createdAt)}</Text>
+          {isMe && <Text style={[styles.ticks, { color: msg.isRead ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.45)' }]}>{msg.isRead ? ' ✓✓' : ' ✓'}</Text>}
         </View>
       </View>
       {isMe && showTail && <TailOut color={OUT_COLOR} />}
@@ -93,23 +77,21 @@ export default function ChatScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
   const { id } = useLocalSearchParams<{ id: string }>()
-  const myId = useAuthStore(s => s.user?.id) ?? 'me'
+  const myId = useAuthStore(ss => ss.user?.id) ?? 'me'
   const { isDark, colors } = useTheme()
   const queryClient = useQueryClient()
 
   const [messages, setMessages] = useState<Message[]>([])
   const [text, setText] = useState('')
-  const [connected, setConnected] = useState(false)
   const [typing, setTyping] = useState(false)
   const flatRef = useRef<FlatList>(null)
   const typingTimer = useRef<any>(null)
 
-  // Загружаем историю сообщений
   const { data, isLoading } = useQuery({
     queryKey: [QUERY_KEYS.MESSAGES, id],
     queryFn: () => chatService.getMessages(id ?? '').then(r => r.data.data),
     enabled: !!id,
-    staleTime: 0, // всегда перезагружаем при входе
+    staleTime: 0,
     refetchOnMount: true
   })
 
@@ -117,7 +99,6 @@ export default function ChatScreen() {
     if (data) setMessages(data)
   }, [data])
 
-  // WebSocket
   const { sendMessage, markRead, sendTyping } = useSocket({
     roomId: id,
     onMessage: (msg: Message) => {
@@ -125,16 +106,13 @@ export default function ChatScreen() {
         if (prev.find(m => m.id === msg.id)) return prev
         return [...prev, msg]
       })
-      // Помечаем прочитанным если сообщение от другого
       if (msg.senderId !== myId) {
         markRead(id ?? '')
-        // Обновляем список чатов чтобы сбросить бэйдж
         queryClient.invalidateQueries({ queryKey: ['chat_rooms'] })
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-shadow
-    onTyping: (data: any) => {
-      if (data.userId !== myId) setTyping(data.isTyping)
+    onTyping: (_data: any) => {
+      if (_data.userId !== myId) setTyping(_data.isTyping)
     },
     onStatus: () => {}
   })
@@ -146,7 +124,6 @@ export default function ChatScreen() {
   useEffect(() => {
     if (id) {
       markRead(id)
-      // Сбрасываем бэйдж при входе
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['chat_rooms'] })
       }, 500)
@@ -156,8 +133,6 @@ export default function ChatScreen() {
   const send = useCallback(() => {
     const t = text.trim()
     if (!t || !id) return
-    // НЕ добавляем оптимистично — ждём onMessage от сервера
-    // чтобы не было дублирования
     sendMessage(id, t)
     setText('')
   }, [text, id, sendMessage])
@@ -171,10 +146,7 @@ export default function ChatScreen() {
   }
 
   const pickImage = async () => {
-    const r = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 0.8
-    })
+    const r = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8 })
     if (!r.canceled && r.assets[0] && id) {
       sendMessage(id, 'Фото', 'image', r.assets[0].uri)
     }
@@ -186,31 +158,23 @@ export default function ChatScreen() {
   const fieldBg = isDark ? '#242F3D' : '#F0F0F0'
 
   return (
-    <View style={{ flex: 1, backgroundColor: chatBg }}>
+    <Screen>
       {/* Header */}
-      <View
-        style={[
-          s.header,
-          {
-            backgroundColor: headerBg,
-            paddingTop: insets.top,
-            borderBottomColor: isDark ? '#0D1117' : '#E0E0E0'
-          }
-        ]}>
-        <Pressable onPress={() => router.back()} style={s.backBtn}>
+      <View style={[styles.header, { backgroundColor: headerBg, paddingTop: insets.top, borderBottomColor: isDark ? '#0D1117' : '#E0E0E0' }]}>
+        <Pressable onPress={() => router.back()} style={styles.backBtn}>
           <Text style={{ color: '#FF6B35', fontSize: 26, fontWeight: '300' }}>‹</Text>
         </Pressable>
-        <View style={s.avatarWrap}>
-          <View style={s.avatar}>
-            <Text style={s.avatarTxt}>АС</Text>
+        <View style={styles.avatarWrap}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarTxt}>АС</Text>
           </View>
-          <View style={[s.onlineDot, { borderColor: headerBg }]} />
+          <View style={[styles.onlineDot, { borderColor: headerBg }]} />
         </View>
         <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={[s.hName, { color: colors.text }]}>Собеседник</Text>
-          <Text style={[s.hSub, { color: '#22C55E' }]}>{typing ? 'печатает...' : 'онлайн'}</Text>
+          <Text style={[styles.hName, { color: colors.text }]}>Собеседник</Text>
+          <Text style={[styles.hSub, { color: '#22C55E' }]}>{typing ? 'печатает...' : 'онлайн'}</Text>
         </View>
-        <Pressable style={s.hAction}>
+        <Pressable style={styles.hAction}>
           <Text style={{ fontSize: 20 }}>📋</Text>
         </Pressable>
       </View>
@@ -238,9 +202,9 @@ export default function ChatScreen() {
               return (
                 <>
                   {showDate && (
-                    <View style={s.dateSep}>
-                      <View style={[s.datePill, { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.2)' }]}>
-                        <Text style={[s.dateLabel, { color: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.6)' }]}>{dayLabel(item.createdAt)}</Text>
+                    <View style={styles.dateSep}>
+                      <View style={[styles.datePill, { backgroundColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.2)' }]}>
+                        <Text style={[styles.dateLabel, { color: isDark ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.6)' }]}>{dayLabel(item.createdAt)}</Text>
                       </View>
                     </View>
                   )}
@@ -252,62 +216,25 @@ export default function ChatScreen() {
         )}
 
         {/* Input */}
-        <View
-          style={[
-            s.inputBar,
-            {
-              backgroundColor: inputBg,
-              paddingBottom: insets.bottom + 6,
-              borderTopColor: isDark ? '#0D1117' : '#E0E0E0'
-            }
-          ]}>
-          <Pressable onPress={pickImage} style={s.attachBtn}>
+        <View style={[styles.inputBar, { backgroundColor: inputBg, paddingBottom: insets.bottom + 6, borderTopColor: isDark ? '#0D1117' : '#E0E0E0' }]}>
+          <Pressable onPress={pickImage} style={styles.attachBtn}>
             <Text style={{ fontSize: 22, color: colors.textMuted }}>📎</Text>
           </Pressable>
-          <View style={[s.fieldWrap, { backgroundColor: fieldBg }]}>
+          <View style={[styles.fieldWrap, { backgroundColor: fieldBg }]}>
             <TextInput
               value={text}
               onChangeText={handleTyping}
               placeholder="Сообщение..."
               placeholderTextColor={colors.textMuted}
-              style={[s.field, { color: colors.text, outlineStyle: 'none' }]}
+              style={[styles.field, { color: colors.text, outlineStyle: 'none' } as any]}
               multiline
             />
           </View>
-          <Pressable onPress={send} disabled={!text.trim()} style={[s.sendBtn, { backgroundColor: text.trim() ? '#FF6B35' : fieldBg }]}>
+          <Pressable onPress={send} disabled={!text.trim()} style={[styles.sendBtn, { backgroundColor: text.trim() ? '#FF6B35' : fieldBg }]}>
             <Text style={{ fontSize: 14, color: text.trim() ? '#fff' : colors.textMuted, marginLeft: 2 }}>➤</Text>
           </Pressable>
         </View>
       </KeyboardAvoidingView>
-    </View>
+    </Screen>
   )
 }
-
-const s = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 10, borderBottomWidth: 0.5 },
-  backBtn: { paddingHorizontal: 8, paddingVertical: 6 },
-  avatarWrap: { position: 'relative' },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#FF6B3525', alignItems: 'center', justifyContent: 'center' },
-  avatarTxt: { color: '#FF6B35', fontWeight: '700', fontSize: 14 },
-  onlineDot: { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: '#22C55E', borderWidth: 2 },
-  hName: { fontSize: 16, fontWeight: '600' },
-  hSub: { fontSize: 12, marginTop: 1 },
-  hAction: { padding: 10 },
-  dateSep: { alignItems: 'center', marginVertical: 8 },
-  datePill: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
-  dateLabel: { fontSize: 12, fontWeight: '500' },
-  row: { flexDirection: 'row', alignItems: 'flex-end', marginVertical: 1 },
-  rowOut: { justifyContent: 'flex-end', paddingLeft: 48 },
-  rowIn: { justifyContent: 'flex-start', paddingRight: 48 },
-  bubble: { maxWidth: '100%', paddingHorizontal: 10, paddingTop: 7, paddingBottom: 5, position: 'relative' },
-  msgText: { fontSize: 15, lineHeight: 21 },
-  imgBubble: { width: 200, height: 200, borderRadius: 10, marginBottom: 4 },
-  meta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 2 },
-  time: { fontSize: 11 },
-  ticks: { fontSize: 11 },
-  inputBar: { flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 8, paddingTop: 8, borderTopWidth: 0.5, gap: 6 },
-  attachBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', marginBottom: 2 },
-  fieldWrap: { flex: 1, borderRadius: 22, paddingHorizontal: 14, paddingVertical: 8, maxHeight: 120 },
-  field: { fontSize: 15, lineHeight: 20, padding: 0 },
-  sendBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 2 }
-})
